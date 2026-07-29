@@ -22,7 +22,8 @@ class User extends Authenticatable
     protected function casts(): array 
     { 
         return [ 
-            'password' => 'hashed', 
+            'email_verified_at' => 'datetime', 
+            'password' => 'hashed', // Laravel otomatis meng-hash teks apapun yang masuk ke properti password! 
         ]; 
     } 
  
@@ -39,11 +40,4 @@ class User extends Authenticatable
         return $query->where('stok', '>', 0)->where('status_kondisi', 'Baik'); 
     } 
 
-    protected function casts(): array 
-    { 
-        return [ 
-            'email_verified_at' => 'datetime', 
-            'password' => 'hashed', // Laravel otomatis meng-hash teks apapun yang masuk ke properti password! 
-        ]; 
-    } 
 }
