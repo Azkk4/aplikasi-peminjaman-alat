@@ -26,7 +26,7 @@ class StoreUserRequest extends FormRequest
             ], 
 
             'role' => ['required', 
-                Rule::in(['admin', 'petugas', 'peminjam']) //input hanya boleh dari opsi ini 
+                Rule::in(['admin', 'petugas', 'peminjam']) // input hanya boleh dari opsi ini 
             ], 
             'no_hp' => ['nullable', 'string', 'max:15'], 
             'alamat' => ['nullable', 'string'], 

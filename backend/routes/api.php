@@ -39,6 +39,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // PEMINJAM
      // =================
     Route::middleware('role.peminjam')->group(function () { 
-    // Route untuk hak akses peminjam 
+        Route::get('/katalog', [AlatController::class, 'katalog']);
     }); 
 });
