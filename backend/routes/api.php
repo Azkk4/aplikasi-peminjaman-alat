@@ -32,6 +32,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/peminjaman/{peminjaman}', [PeminjamanController::class, 'show']); 
         Route::put('/peminjaman/{peminjaman}', [PeminjamanController::class, 'update']); 
         Route::delete('/peminjaman/{peminjaman}', [PeminjamanController::class, 'destroy']);
+
+        Route::get('/pengembalian', [PengembalianController::class, 'index']); 
+        Route::get('/pengembalian/{pengembalian}', [PengembalianController::class, 'show']); 
+        Route::put('/pengembalian/{pengembalian}', [PengembalianController::class, 'update']);
+        Route::delete('/pengembalian/{pengembalian}', [PengembalianController::class, 'destroy']); 
     }); 
     // ==================
     // PETUGAS
@@ -39,7 +44,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('role.petugas')->group(function () { 
         Route::post('/peminjaman/{peminjaman}/approve', [PeminjamanController::class, 'approve']); 
-        }); 
+
+        Route::post('/pengembalian', [PengembalianController::class, 'store']); 
+    }); 
 
     // ==================
     // PEMINJAM
