@@ -37,6 +37,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/pengembalian/{pengembalian}', [PengembalianController::class, 'show']); 
         Route::put('/pengembalian/{pengembalian}', [PengembalianController::class, 'update']);
         Route::delete('/pengembalian/{pengembalian}', [PengembalianController::class, 'destroy']); 
+
+        Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']); 
     }); 
     // ==================
     // PETUGAS
