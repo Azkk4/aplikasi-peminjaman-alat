@@ -30,7 +30,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::get('/peminjaman', [PeminjamanController::class, 'index']); 
         Route::get('/peminjaman/{peminjaman}', [PeminjamanController::class, 'show']); 
-        Route::post('/peminjaman/{peminjaman}/approve', [PeminjamanController::class, 'approve']); 
         Route::put('/peminjaman/{peminjaman}', [PeminjamanController::class, 'update']); 
         Route::delete('/peminjaman/{peminjaman}', [PeminjamanController::class, 'destroy']);
     }); 
