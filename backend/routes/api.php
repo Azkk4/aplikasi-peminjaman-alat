@@ -7,6 +7,9 @@ use App\Http\Controllers\API\KategoriController;
 use App\Http\Controllers\API\AlatController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\PeminjamanController;
+use App\Http\Controllers\API\PengembalianController;
+use App\Http\Controllers\API\LaporanController;
+use App\Http\Controllers\API\LogAktivitasController;
 
 // Public Routes (Tidak perlu token) 
 Route::post('/register', [AuthController::class, 'register']); 

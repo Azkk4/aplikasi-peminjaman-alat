@@ -162,7 +162,7 @@ class PengembalianController extends Controller
             return response()->json([ 
                 'message' => 'Data pengembalian berhasil dihapus. Stok dan status peminjaman telah dikembalikan ke kondisi semula.' 
             ]); 
-             catch (Exception $e) { 
+            } catch (Exception $e) { 
             return response()->json(['message' => $e->getMessage()], 422); 
         } 
     }
