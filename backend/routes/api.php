@@ -42,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::delete('/pengembalian/{pengembalian}', [PengembalianController::class, 'destroy']); 
 
         Route::get('/log-aktivitas', [LogAktivitasController::class, 'index']); 
+
+        Route::get('/laporan-peminjaman', [LaporanController::class, 'index']);
     }); 
     // ==================
     // PETUGAS
@@ -51,6 +53,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/peminjaman/{peminjaman}/approve', [PeminjamanController::class, 'approve']); 
 
         Route::post('/pengembalian', [PengembalianController::class, 'store']); 
+
+        Route::get('/laporan-peminjaman', [LaporanController::class, 'index']);
     }); 
 
     // ==================
