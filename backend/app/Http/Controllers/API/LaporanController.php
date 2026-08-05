@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Http\Resources\PeminjamanResource; 
 use App\Models\Peminjaman; 
 use Illuminate\Http\JsonResponse; 
-use Illuminate\Http\Request; 
 use Illuminate\Support\Facades\Validator; 
 
 class LaporanController extends Controller
