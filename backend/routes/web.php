@@ -10,7 +10,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-//admin
+// ==========
+// Admin
+// ==========
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
@@ -20,9 +22,24 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     // CRUD User
     Route::get('/users', [AdminController::class, 'indexUser'])->name('user.index');
-});
+    Route::get('/users/create', [AdminController::class, 'createUser'])->name('user.create');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('user.store');
+    Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('user.edit');
+    Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('user.update');
+    Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('user.destroy');
+    });
 
-//petugas
+    // CRUD Kategori
+    Route::get('/kategori', [AdminController::class, 'indexKategori'])->name('kategori.index');
+    Route::get('/kategori/create', [AdminController::class, 'createKategori'])->name('kategori.create');
+    Route::post('/kategori', [AdminController::class, 'storeKategori'])->name('kategori.store');
+    Route::get('/kategori/{id}/edit', [AdminController::class, 'editKategori'])->name('kategori.edit');
+    Route::put('/kategori/{id}', [AdminController::class, 'updateKategori'])->name('kategori.update');
+    Route::delete('/kategori/{id}', [AdminController::class, 'destroyKategori'])->name('kategori.destroy');
+
+// ==========
+// Petugas
+// ==========
 Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petugas.')->group(function () {
 
     // Peminjaman & Persetujuan
@@ -33,7 +50,9 @@ Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petu
     Route::post('/pengembalian/{id}', [PetugasController::class, 'prosesPengembalian'])->name('pengembalian.proses');
 });
 
-//Peminjam
+// ==========
+// Peminjam
+// ==========
 Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
 
     // Katalog & Pengajuan

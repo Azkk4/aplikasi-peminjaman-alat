@@ -25,14 +25,19 @@
                     Dashboard
                 </a>
 
-                <a href="{{ route('admin.alat.index') }}"
-                   class="block px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
-                    Kelola Alat
-                </a>
-
                 <a href="{{ route('admin.user.index') }}"
                    class="block px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
                     Kelola User
+                </a>
+
+                <a href="{{ route('admin.kategori.index') }}"
+                   class="block px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    Kelola Kategori
+                </a>
+
+                <a href="{{ route('admin.alat.index') }}"
+                   class="block px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
+                    Kelola Alat
                 </a>
             </nav>
 
@@ -65,7 +70,7 @@
                 </div>
             </header>
 
-            <!-- CONTENT UTAMA HALAMAN -->
+            <!-- KONTEN UTAMA HALAMAN -->
             <main class="flex-1 p-6">
                 @yield('content')
             </main>
