@@ -39,6 +39,11 @@
                    class="block px-4 py-2 rounded-lg text-gray-400 hover:bg-gray-800 hover:text-white transition">
                     Kelola Alat
                 </a>
+
+                <a href="{{ route('admin.peminjaman.index') }}" 
+                   class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.peminjaman.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    Kelola Peminjaman
+                </a>
             </nav>
 
             <div class="p-4 border-t border-gray-800 text-sm text-gray-400">
