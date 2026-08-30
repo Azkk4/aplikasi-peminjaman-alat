@@ -44,6 +44,11 @@
                    class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.peminjaman.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                     Kelola Peminjaman
                 </a>
+
+                <a href="{{ route('admin.pengembalian.index') }}" 
+                   class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.pengembalian.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
+                    Kelola Pengembalian
+                </a>
             </nav>
 
             <div class="p-4 border-t border-gray-800 text-sm text-gray-400">

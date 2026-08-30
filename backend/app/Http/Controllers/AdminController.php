@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\LogAktivitas;
 use App\Models\Peminjaman;
 use App\Models\DetailPinjam;
+use App\Models\Pengembalian;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Exception;
@@ -296,7 +297,7 @@ class AdminController extends Controller
     {
         $search = $request->input('search');
 
-        $peminjamans = Peminjaman::with(['user', 'detailPinjams.alat'])
+        $peminjamans = Peminjaman::with(['user', 'detailPinjam.alat'])
             ->when($search, function ($query, $search) {
                 return $query->where('status', 'like', "%{$search}%")
                     ->orWhereHas('user', function ($q) use ($search) {
@@ -423,5 +424,32 @@ class AdminController extends Controller
         $peminjaman->delete();
 
         return redirect()->route('admin.peminjaman.index')->with('success', 'Data peminjaman berhasil dihapus.');
+    }
+
+    // ============================================
+    // KELOLA PENGEMBALIAN - Monitoring & History
+    // ============================================
+
+    // Menampilkan daftar pengembalian alat
+    public function indexPengembalian(Request $request)
+    {
+        $search = $request->input('search');
+
+        $peminjamans = Peminjaman::with(['user', 'detailPinjam.alat', 'pengembalian.petugas'])
+            ->whereHas('pengembalian') // Hanya tampilkan peminjaman yang sudah dikembalikan
+            ->when($search, function ($query, $search) {
+                return $query->where('status', 'like', "%{$search}%")
+                    ->orWhereHas('user', function ($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    })
+                    ->orWhereHas('detailPinjam.alat', function ($q) use ($search) {
+                        $q->where('nama_alat', 'like', "%{$search}%");
+                    });
+            })
+            ->latest()
+            ->paginate(10)
+            ->withQueryString();
+
+        return view('admin.pengembalian.index', compact('peminjamans', 'search'));
     }
 }
