@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Persetujuan Peminjaman')
-@section('header-title', 'Daftar Pengajuan Peminjaman Alat')
+@section('title', 'Pemantauan Pengembalian')
+@section('header-title', 'Pemantauan & Pengembalian Alat')
 
 @section('content')
 @if(session('success'))
@@ -18,32 +18,33 @@
 
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
     <div class="p-5 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <h3 class="text-lg font-bold text-gray-800">Menunggu Verifikasi Persetujuan</h3>
+        <h3 class="text-lg font-bold text-gray-800">Daftar Alat Sedang Dipinjam</h3>
 
         <!-- Form Pencarian Peminjam -->
-        <form action="{{ route('petugas.peminjaman.index') }}" method="GET" class="flex w-full md:w-80">
+        <form action="{{ route('petugas.pengembalian.index') }}" method="GET" class="flex w-full md:w-80">
             <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari nama peminjam..."
                 class="w-full px-3 py-2 text-sm border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
             <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 text-sm font-semibold rounded-r-lg transition">
                 Cari
             </button>
             @if(request('search'))
-                <a href="{{ route('petugas.peminjaman.index') }}" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 text-sm rounded-lg flex items-center transition">
+                <a href="{{ route('petugas.pengembalian.index') }}" class="ml-2 bg-gray-300 hover:bg-gray-400 text-gray-700 px-3 py-2 text-sm rounded-lg flex items-center transition">
                     Reset
                 </a>
             @endif
         </form>
     </div>
 
-    <!-- Tabel Daftar Pengajuan -->
+    <!-- Tabel Daftar Pengembalian -->
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
                 <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
                     <th class="py-3 px-4 border-b">Peminjam</th>
                     <th class="py-3 px-4 border-b">Tanggal Pinjam</th>
-                    <th class="py-3 px-4 border-b">Rencana Kembali</th>
-                    <th class="py-3 px-4 border-b">Detail Alat</th>
+                    <th class="py-3 px-4 border-b">Tenggat Kembali</th>
+                    <th class="py-3 px-4 border-b">Alat yang Dipinjam</th>
+                    <th class="py-3 px-4 border-b">Status</th>
                     <th class="py-3 px-4 border-b text-center">Aksi</th>
                 </tr>
             </thead>
@@ -60,34 +61,30 @@
                                 @foreach($item->detailPinjam as $detail)
                                     <li>
                                         <span class="font-semibold">{{ $detail->alat->nama_alat ?? 'Alat Dihapus' }}</span>
-                                        (Jumlah: {{ $detail->jumlah }})
+                                        ({{ $detail->jumlah }} unit)
                                     </li>
                                 @endforeach
                             </ul>
                         </td>
+                        <td class="py-3 px-4 border-b">
+                            <span class="text-xs font-semibold text-amber-700 bg-amber-50 border border-amber-200 px-2.5 py-1 rounded">
+                                {{ ucfirst($item->status) }}
+                            </span>
+                        </td>
                         <td class="py-3 px-4 border-b text-center">
-                            @if($item->status == 'diajukan')
-                                <div class="flex justify-center items-center space-x-2">
-                                    <!-- Tombol Setujui -->
-                                    <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" onclick="return confirm('Setujui peminjaman alat ini?')"
-                                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm">
-                                            Setujui
-                                        </button>
-                                    </form>
-
-                                    <!-- Tombol Tolak -->
-                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" onclick="return confirm('Yakin ingin menolak pengajuan peminjaman ini?')"
-                                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm">
-                                            Tolak
-                                        </button>
-                                    </form>
-                                </div>
+                            @if($item->status == 'dipinjam')
+                                <!-- Form Proses Terima Pengembalian -->
+                                <form action="{{ route('petugas.pengembalian.proses', $item->id) }}" method="POST" class="inline-block">
+                                    @csrf
+                                    <input type="hidden" name="kondisi_kembali" value="Baik">
+                                    <input type="hidden" name="denda" value="0">
+                                    <button type="submit" onclick="return confirm('Proses dan terima pengembalian alat ini?')"
+                                        class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm">
+                                        Terima Kembali
+                                    </button>
+                                </form>
                             @else
-                                <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+                                <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-2.5 py-1 rounded">
                                     {{ ucfirst($item->status) }}
                                 </span>
                             @endif
@@ -95,8 +92,8 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="py-6 text-center text-gray-500">
-                            Tidak ada pengajuan peminjaman baru.
+                        <td colspan="6" class="py-6 text-center text-gray-500">
+                            Tidak ada alat yang sedang dipinjam saat ini.
                         </td>
                     </tr>
                 @endforelse
