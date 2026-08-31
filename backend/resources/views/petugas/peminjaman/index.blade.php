@@ -39,12 +39,12 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4 border-b">Peminjam</th>
-                    <th class="py-3 px-4 border-b">Tanggal Pinjam</th>
-                    <th class="py-3 px-4 border-b">Rencana Kembali</th>
-                    <th class="py-3 px-4 border-b">Detail Alat</th>
-                    <th class="py-3 px-4 border-b text-center">Aksi</th>
+                <tr class="bg-gray-100 border-b-2 border-gray-300">
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Peminjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tanggal Pinjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rencana Kembali</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Detail Alat</th>
+                    <th class="py-4 px-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
@@ -65,29 +65,40 @@
                                 @endforeach
                             </ul>
                         </td>
-                        <td class="py-3 px-4 border-b text-center">
+                        <td class="py-3 px-4 border-b">
                             @if($item->status == 'diajukan')
-                                <div class="flex justify-center items-center space-x-2">
+                                <div class="flex flex-col gap-2 w-full">
                                     <!-- Tombol Setujui -->
-                                    <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST">
+                                    <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST" class="w-full">
                                         @csrf
                                         <button type="submit" onclick="return confirm('Setujui peminjaman alat ini?')"
-                                            class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm">
-                                            Setujui
+                                            class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm inline-flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span>Setujui</span>
                                         </button>
                                     </form>
 
                                     <!-- Tombol Tolak -->
-                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST">
+                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST" class="w-full">
                                         @csrf
                                         <button type="submit" onclick="return confirm('Yakin ingin menolak pengajuan peminjaman ini?')"
-                                            class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition shadow-sm">
-                                            Tolak
+                                            class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm inline-flex items-center justify-center gap-2">
+                                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                                            </svg>
+                                            <span>Tolak</span>
                                         </button>
                                     </form>
                                 </div>
                             @else
-                                <span class="text-xs font-semibold text-blue-600 bg-blue-50 px-2.5 py-1 rounded">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-700 rounded-full">
+                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+                                    </svg>
+                                    {{ ucfirst($item->status) }}
+                                </span>
                                     {{ ucfirst($item->status) }}
                                 </span>
                             @endif

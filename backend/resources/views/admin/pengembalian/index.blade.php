@@ -40,15 +40,15 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4 border-b">Peminjam</th>
-                    <th class="py-3 px-4 border-b">Alat yang Dipinjam</th>
-                    <th class="py-3 px-4 border-b">Tgl Pinjam / Rencana</th>
-                    <th class="py-3 px-4 border-b">Tgl Kembali Aktual</th>
-                    <th class="py-3 px-4 border-b">Kondisi</th>
-                    <th class="py-3 px-4 border-b">Denda (Rp)</th>
-                    <th class="py-3 px-4 border-b">Petugas</th>
-                    <th class="py-3 px-4 border-b">Status</th>
+                <tr class="bg-gray-100 border-b-2 border-gray-300">
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Peminjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Alat yang Dipinjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Pinjam / Rencana</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Kembali Aktual</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kondisi</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Denda (Rp)</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Petugas</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
@@ -78,17 +78,11 @@
                             <span class="text-gray-500 italic">-</span>
                         @endif
                     </td>
-                    <td class="py-3 px-4 text-xs">
+                    <td class="py-3 px-4">
                         @if($peminjaman->pengembalian)
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold
-                            @if($peminjaman->pengembalian->kondisi_kembali == 'Baik') bg-emerald-100 text-emerald-800
-                            @elseif($peminjaman->pengembalian->kondisi_kembali == 'Rusak Ringan') bg-yellow-100 text-yellow-800
-                            @elseif($peminjaman->pengembalian->kondisi_kembali == 'Rusak Berat') bg-red-100 text-red-800
-                            @else bg-gray-100 text-gray-800 @endif">
-                                {{ $peminjaman->pengembalian->kondisi_kembali }}
-                            </span>
+                            @include('components.kondisi-badge', ['kondisi' => $peminjaman->pengembalian->kondisi_kembali])
                         @else
-                            <span class="text-gray-500 italic">-</span>
+                            <span class="text-gray-500 italic text-xs">-</span>
                         @endif
                     </td>
                     <td class="py-3 px-4 text-xs text-right font-medium">
@@ -106,13 +100,7 @@
                         @endif
                     </td>
                     <td class="py-3 px-4">
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full
-                        @if($peminjaman->status == 'diajukan') bg-yellow-100 text-yellow-800
-                        @elseif($peminjaman->status == 'dipinjam') bg-blue-100 text-blue-800
-                        @elseif($peminjaman->status == 'selesai') bg-emerald-100 text-emerald-800
-                        @else bg-red-100 text-red-800 @endif">
-                            {{ ucfirst($peminjaman->status) }}
-                        </span>
+                        @include('components.status-badge', ['status' => $peminjaman->status])
                     </td>
                 </tr>
                 @empty

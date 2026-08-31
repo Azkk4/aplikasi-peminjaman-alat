@@ -53,13 +53,13 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider">
-                        <th class="py-3 px-4 border-b">No</th>
-                        <th class="py-3 px-4 border-b">Nama Peminjam</th>
-                        <th class="py-3 px-4 border-b">Tgl Pinjam</th>
-                        <th class="py-3 px-4 border-b">Rencana Kembali</th>
-                        <th class="py-3 px-4 border-b">Detail Alat</th>
-                        <th class="py-3 px-4 border-b text-center">Status</th>
+                    <tr class="bg-gray-100 border-b-2 border-gray-300">
+                        <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">No</th>
+                        <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Nama Peminjam</th>
+                        <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Pinjam</th>
+                        <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rencana Kembali</th>
+                        <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Detail Alat</th>
+                        <th class="py-4 px-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 text-sm">
@@ -82,15 +82,7 @@
                                 </ul>
                             </td>
                             <td class="py-3 px-4 border-b text-center">
-                                @if($item->status == 'dipinjam')
-                                    <span class="text-xs font-semibold text-amber-700 bg-amber-50 px-2.5 py-1 rounded">Dipinjam</span>
-                                @elseif($item->status == 'selesai')
-                                    <span class="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded">Selesai</span>
-                                @elseif($item->status == 'telat')
-                                    <span class="text-xs font-semibold text-red-700 bg-red-50 px-2.5 py-1 rounded">Telat</span>
-                                @else
-                                    <span class="text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded">{{ ucfirst($item->status) }}</span>
-                                @endif
+                                @include('components.status-badge', ['status' => $item->status])
                             </td>
                         </tr>
                     @empty

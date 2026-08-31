@@ -19,6 +19,36 @@ class Alat extends Model
         ];
     }
 
+    public function getImageUrlAttribute(): string
+    {
+        if (empty($this->gambar)) {
+            return asset('images/no-image.svg');
+        }
+
+        $gambar = $this->gambar;
+
+        if (str_starts_with($gambar, 'http://') || str_starts_with($gambar, 'https://')) {
+            return $gambar;
+        }
+
+        $cleanPath = ltrim($gambar, '/');
+        $normalized = preg_replace('#^storage/#', '', $cleanPath);
+
+        if ($normalized && file_exists(public_path('storage/' . $normalized))) {
+            return asset('storage/' . $normalized);
+        }
+
+        if ($normalized && file_exists(public_path($normalized))) {
+            return asset($normalized);
+        }
+
+        if ($cleanPath && file_exists(public_path($cleanPath))) {
+            return asset($cleanPath);
+        }
+
+        return asset('images/no-image.svg');
+    }
+
     public function kategori(): BelongsTo {
         return $this->belongsTo(Kategori::class);
     }

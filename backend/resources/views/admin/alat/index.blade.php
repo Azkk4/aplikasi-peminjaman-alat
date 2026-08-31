@@ -40,34 +40,27 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4 border-b">Gambar</th>
-                    <th class="py-3 px-4 border-b">Nama Alat</th>
-                    <th class="py-3 px-4 border-b">Kategori</th>
-                    <th class="py-3 px-4 border-b">Stok</th>
-                    <th class="py-3 px-4 border-b">Kondisi</th>
-                    <th class="py-3 px-4 border-b">Aksi</th>
+                <tr class="bg-gray-100 border-b-2 border-gray-300">
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Gambar</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Nama Alat</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kategori</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Stok</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Kondisi</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
                 @forelse($alats as $alat)
                 <tr class="hover:bg-gray-50 transition">
                     <td class="py-3 px-4 border-b">
-                        @if($alat->gambar)
-                            <img src="{{ asset($alat->gambar) }}" alt="{{ $alat->nama_alat }}" class="w-12 h-12 object-cover rounded-lg border">
-                        @else
-                            <span class="text-xs text-gray-400 italic">Tidak ada</span>
-                        @endif
+                        <img src="{{ $alat->image_url }}" alt="{{ $alat->nama_alat }}" class="w-12 h-12 object-cover rounded-lg border"
+                             onerror="this.onerror=null;this.src='{{ asset('images/no-image.svg') }}';">
                     </td>
                     <td class="py-3 px-4 border-b font-medium text-gray-900">{{ $alat->nama_alat }}</td>
                     <td class="py-3 px-4 border-b">{{ $alat->kategori->nama_kategori ?? '-' }}</td>
                     <td class="py-3 px-4 border-b font-semibold">{{ $alat->stok }}</td>
                     <td class="py-3 px-4 border-b">
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full
-                        @if(strtolower($alat->status_kondisi) == 'baik') bg-emerald-100 text-emerald-800
-                        @else bg-amber-100 text-amber-800 @endif">
-                            {{ $alat->status_kondisi }}
-                        </span>
+                        @include('components.kondisi-badge', ['kondisi' => $alat->status_kondisi])
                     </td>
                     <td class="py-3 px-4 border-b">
                         <div class="flex items-center space-x-2">

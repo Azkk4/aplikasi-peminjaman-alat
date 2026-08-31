@@ -31,9 +31,9 @@ class AuthController extends Controller
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role == 'petugas') {
                 return redirect()->route('petugas.peminjaman.index');
-            } elseif ($user->role == 'peminjam') {
-                return redirect()->route('peminjaman.katalog');
             }
+
+            return redirect()->route('login')->with('error', 'Role yang dipilih belum aktif pada sistem ini.');
 
             Auth::logout();
             return redirect()->route('login')->with('error', 'Role tidak dikenali.');

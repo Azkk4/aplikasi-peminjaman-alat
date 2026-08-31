@@ -16,15 +16,15 @@ class PeminjamanSeeder extends Seeder
         $peminjaman = [ 
             [
                 'user_id' => 3, // Rian (Peminjam) 
-                'tgl_pinjam' => '2026-06-01', 
-                'tgl_kembali_plan' => '2026-06-04', 
-                'status' => 'dikembalikan', 
+                'tgl_pinjam' => '2026-06-01 10:00:00', 
+                'tgl_kembali_plan' => '2026-06-04 23:59:59', 
+                'status' => 'selesai', 
             ], 
             [ 
                 'user_id' => 4, // Siti (Peminjam) 
-                'tgl_pinjam' => '2026-06-02', 
-                'tgl_kembali_plan' => '2026-06-05', 
-                'status' => 'dikembalikan', 
+                'tgl_pinjam' => '2026-06-02 09:30:00', 
+                'tgl_kembali_plan' => '2026-06-05 23:59:59', 
+                'status' => 'selesai', 
             ], 
             [ 
                 'user_id' => 5, // Eka (Peminjam) 

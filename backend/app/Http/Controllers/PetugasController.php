@@ -91,7 +91,6 @@ class PetugasController extends Controller
                 'petugas_id'       => auth()->id(),
             ]);
 
-            // Update status peminjaman jadi selesai
             $peminjaman->update([
                 'status' => 'selesai'
             ]);

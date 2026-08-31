@@ -7,6 +7,7 @@ use App\Models\Peminjaman;
 use App\Models\DetailPinjam;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PeminjamController extends Controller
 {
@@ -32,7 +33,7 @@ class PeminjamController extends Controller
             $peminjaman = Peminjaman::create([
                 'user_id' => auth()->id(),
                 'tgl_pinjam' => now(),
-                'tgl_kembali_plan' => $request->tgl_kembali_plan,
+                'tgl_kembali_plan' => Carbon::parse($request->tgl_kembali_plan)->endOfDay(),
                 'status' => 'diajukan',
             ]);
 
@@ -62,7 +63,7 @@ class PeminjamController extends Controller
     // Melihat riwayat peminjaman user yang sedang login
     public function riwayatPeminjaman()
     {
-        $peminjamans = Peminjaman::with('detailPinjams.alat')
+        $peminjamans = Peminjaman::with('detailPinjam.alat')
             ->where('user_id', auth()->id())
             ->latest()
             ->get();

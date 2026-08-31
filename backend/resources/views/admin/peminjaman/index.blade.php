@@ -46,12 +46,12 @@
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
-                    <th class="py-3 px-4 border-b">Peminjam</th>
-                    <th class="py-3 px-4 border-b">Alat yang Dipinjam</th>
-                    <th class="py-3 px-4 border-b">Tgl Pinjam / Rencana Kembali</th>
-                    <th class="py-3 px-4 border-b">Status</th>
-                    <th class="py-3 px-4 border-b">Aksi</th>
+                <tr class="bg-gray-100 border-b-2 border-gray-300">
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Peminjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Alat yang Dipinjam</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Pinjam / Rencana Kembali</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
@@ -75,13 +75,7 @@
                         <span class="block font-semibold">Rencana: {{ $peminjaman->tgl_kembali_plan }}</span>
                     </td>
                     <td class="py-3 px-4 border-b">
-                        <span class="px-2.5 py-1 text-xs font-semibold rounded-full
-                        @if($peminjaman->status == 'diajukan') bg-yellow-100 text-yellow-808
-                        @elseif($peminjaman->status == 'dipinjam') bg-blue-100 text-blue-800
-                        @elseif($peminjaman->status == 'selesai') bg-emerald-100 text-emerald-800
-                        @else bg-red-100 text-red-800 @endif">
-                            {{ ucfirst($peminjaman->status) }}
-                        </span>
+                        @include('components.status-badge', ['status' => $peminjaman->status])
                     </td>
                     <td class="py-3 px-4 border-b">
                         <div class="flex flex-col space-y-2">
@@ -111,7 +105,14 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="py-4 text-center text-gray-500">Belum ada data peminjaman.</td>
+                    <td colspan="5">
+                        @include('components.empty-state', [
+                            'title' => 'Belum ada peminjaman',
+                            'message' => 'Tidak ada data transaksi peminjaman. Mulai dengan menambahkan peminjaman baru.',
+                            'action' => '+ Tambah Peminjaman Baru',
+                            'actionUrl' => route('admin.peminjaman.create')
+                        ])
+                    </td>
                 </tr>
                 @endforelse
             </tbody>

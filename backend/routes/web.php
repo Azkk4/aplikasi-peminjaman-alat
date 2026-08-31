@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PetugasController;
-use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
@@ -72,17 +71,6 @@ Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petu
 
     // Cetak Laporan (Tambahkan method ini atau arahkan sementara)
     Route::get('/laporan', [PetugasController::class, 'indexLaporan'])->name('laporan.index');
-});
-
-// ==========
-// Peminjam
-// ==========
-Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
-
-    // Katalog & Pengajuan
-    Route::get('/katalog', [PeminjamController::class, 'katalogAlat'])->name('katalog');
-    Route::post('/peminjaman/ajukan', [PeminjamController::class, 'ajukanPeminjaman'])->name('peminjaman.ajukan');
-    Route::get('/riwayat', [PeminjamController::class, 'riwayatPeminjaman'])->name('riwayat');
 });
 
 // Route Tamu (Belum Login)
