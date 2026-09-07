@@ -49,22 +49,31 @@ class PetugasController extends Controller
     // Menyetujui Peminjaman (Mengubah status & mengurangi stok alat)
     public function setujuiPeminjaman($id)
     {
-        DB::beginTransaction();
         try {
-            $peminjaman = Peminjaman::with('detailPinjam')->findOrFail($id);
-            $peminjaman->update(['status' => 'dipinjam']);
+            DB::transaction(function () use ($id) {
+                $peminjaman = Peminjaman::with('detailPinjam')
+                    ->lockForUpdate()
+                    ->findOrFail($id);
 
-            // Kurangi stok alat secara otomatis
-            foreach ($peminjaman->detailPinjam as $detail) {
-                $alat = Alat::findOrFail($detail->alat_id);
-                $alat->stok -= $detail->jumlah;
-                $alat->save();
-            }
+                if ($peminjaman->status !== 'diajukan') {
+                    throw new \RuntimeException('Status peminjaman sudah berubah.');
+                }
 
-            DB::commit();
+                foreach ($peminjaman->detailPinjam->sortBy('alat_id') as $detail) {
+                    $alat = Alat::lockForUpdate()->findOrFail($detail->alat_id);
+
+                    if ($alat->status_kondisi !== 'Baik' || $alat->stok < $detail->jumlah) {
+                        throw new \RuntimeException("Stok alat {$alat->nama_alat} tidak mencukupi.");
+                    }
+
+                    $alat->decrement('stok', $detail->jumlah);
+                }
+
+                $peminjaman->update(['status' => 'dipinjam']);
+            });
+
             return redirect()->back()->with('success', 'Peminjaman disetujui dan stok alat dikurangi.');
         } catch (\Exception $e) {
-            DB::rollback();
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }

@@ -1,80 +1,26 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalog Alat Peminjam</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand" href="#">Panel Peminjam</a>
-            <div class="d-flex">
-                <a href="{{ route('peminjam.riwayat') }}" class="btn btn-outline-light btn-sm me-2">Riwayat Pinjam</a>
-                <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-light btn-sm text-primary">Logout</button>
-                </form>
-            </div>
-        </div>
-    </nav>
+@extends('layouts.app')
 
-    <div class="container">
-        @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-
-        @if (session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
-
-        <h3 class="mb-3">Katalog Alat Tersedia</h3>
-
-        <form action="{{ route('peminjam.peminjaman.ajukan') }}" method="POST">
-            @csrf
-            <div class="card shadow-sm mb-4">
-                <div class="card-body">
-                    <div class="mb-3">
-                        <label class="form-label">Rencana Tanggal Kembali</label>
-                        <input type="date" name="tgl_kembali_plan" class="form-control" required>
-                    </div>
-
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th width="50" class="text-center">Pilih</th>
-                                <th>Nama Alat</th>
-                                <th>Kategori</th>
-                                <th>Stok Tersedia</th>
-                                <th width="150">Jumlah Pinjam</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($alats as $index => $alat)
-                                <tr>
-                                    <td class="text-center">
-                                        <input type="checkbox" name="alat_id[]" value="{{ $alat->id }}" class="form-check-input">
-                                    </td>
-                                    <td>{{ $alat->nama_alat }}</td>
-                                    <td>{{ $alat->kategori->nama_kategori }}</td>
-                                    <td>{{ $alat->stok }}</td>
-                                    <td>
-                                        <input type="number" name="jumlah[]" class="form-control form-control-sm" value="1" min="1" max="{{ $alat->stok }}">
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="text-center">Tidak ada alat yang tersedia saat ini.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-
-                    <button type="submit" class="btn btn-primary">Ajukan Peminjaman</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</body>
-</html>
+@section('title', 'Katalog Alat')
+@section('header-title', 'Katalog Alat')
+@section('content')
+<div class="mb-6 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+    <div><p class="text-sm font-medium text-emerald-600">Temukan alat yang kamu perlukan</p><h1 class="mt-1 text-2xl font-bold text-gray-900">Katalog alat</h1></div>
+    <a href="{{ route('peminjam.peminjaman.index') }}" class="text-sm font-semibold text-emerald-600 hover:text-emerald-700">Lihat peminjaman saya &rarr;</a>
+ </div>
+<form method="GET" class="mb-6 grid grid-cols-1 gap-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:grid-cols-[1fr_220px_auto]">
+    <input type="search" name="search" value="{{ request('search') }}" placeholder="Cari nama alat..." class="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200">
+    <select name="kategori_id" class="rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"><option value="">Semua kategori</option>@foreach($kategoris as $kategori)<option value="{{ $kategori->id }}" {{ request('kategori_id') == $kategori->id ? 'selected' : '' }}>{{ $kategori->nama_kategori }}</option>@endforeach</select>
+    <button class="rounded-lg bg-gray-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-700">Cari</button>
+ </form>
+<div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+    @forelse($alats as $alat)
+        <article class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <img src="{{ $alat->image_url }}" alt="{{ $alat->nama_alat }}" class="h-40 w-full object-cover bg-gray-100">
+            <div class="p-5"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-medium text-emerald-600">{{ $alat->kategori->nama_kategori ?? 'Tanpa kategori' }}</p><h2 class="mt-1 text-lg font-bold text-gray-900">{{ $alat->nama_alat }}</h2></div><span class="whitespace-nowrap text-xs font-semibold text-emerald-700">{{ $alat->stok }} tersedia</span></div><div class="mt-4">@include('components.kondisi-badge', ['kondisi' => $alat->status_kondisi])</div><a href="{{ route('peminjam.katalog.show', $alat) }}" class="mt-5 block rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:border-emerald-600 hover:text-emerald-700">Lihat detail</a></div>
+        </article>
+    @empty
+        <div class="col-span-full rounded-lg border border-gray-200 bg-white">@include('components.empty-state', ['title' => 'Alat tidak ditemukan', 'message' => 'Coba ubah kata kunci atau kategori pencarian.'])</div>
+    @endforelse
+ </div>
+<div class="mt-6">{{ $alats->links() }}</div>
+@endsection

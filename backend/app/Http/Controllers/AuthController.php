@@ -33,6 +33,10 @@ class AuthController extends Controller
                 return redirect()->route('petugas.peminjaman.index');
             }
 
+            if ($user->role == 'peminjam') {
+                return redirect()->route('peminjam.dashboard');
+            }
+
             return redirect()->route('login')->with('error', 'Role yang dipilih belum aktif pada sistem ini.');
 
             Auth::logout();

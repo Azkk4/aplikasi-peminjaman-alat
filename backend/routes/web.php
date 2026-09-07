@@ -3,10 +3,20 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\PetugasController;
+use App\Http\Controllers\PeminjamController;
 use App\Http\Controllers\AuthController;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::middleware('auth')->get('/dashboard', function () {
+    return match (auth()->user()->role) {
+        'admin' => redirect()->route('admin.dashboard'),
+        'petugas' => redirect()->route('petugas.peminjaman.index'),
+        'peminjam' => redirect()->route('peminjam.dashboard'),
+        default => abort(403),
+    };
 });
 
 // ==========
@@ -71,6 +81,22 @@ Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petu
 
     // Cetak Laporan (Tambahkan method ini atau arahkan sementara)
     Route::get('/laporan', [PetugasController::class, 'indexLaporan'])->name('laporan.index');
+});
+
+// ==========
+// Peminjam
+// ==========
+Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
+    Route::get('/dashboard', [PeminjamController::class, 'dashboard'])->name('dashboard');
+    Route::get('/katalog', [PeminjamController::class, 'katalogAlat'])->name('katalog.index');
+    Route::get('/katalog/{alat}', [PeminjamController::class, 'detailAlat'])->name('katalog.show');
+    Route::get('/peminjaman/create', [PeminjamController::class, 'createPeminjaman'])->name('peminjaman.create');
+    Route::post('/peminjaman', [PeminjamController::class, 'ajukanPeminjaman'])->name('peminjaman.store');
+    Route::get('/peminjaman', [PeminjamController::class, 'peminjamanSaya'])->name('peminjaman.index');
+    Route::get('/peminjaman/{peminjaman}', [PeminjamController::class, 'detailPeminjaman'])->name('peminjaman.show');
+    Route::get('/riwayat', [PeminjamController::class, 'riwayatPeminjaman'])->name('riwayat');
+    Route::get('/profil', [PeminjamController::class, 'profil'])->name('profil');
+    Route::put('/profil', [PeminjamController::class, 'updateProfil'])->name('profil.update');
 });
 
 // Route Tamu (Belum Login)

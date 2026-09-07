@@ -67,9 +67,9 @@
                         </td>
                         <td class="py-3 px-4 border-b">
                             @if($item->status == 'diajukan')
-                                <div class="flex flex-col gap-2 w-full">
+                                <div class="flex flex-row gap-2 justify-center">
                                     <!-- Tombol Setujui -->
-                                    <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST" class="w-full">
+                                    <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" onclick="return confirm('Setujui peminjaman alat ini?')"
                                             class="w-full bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm inline-flex items-center justify-center gap-2">
@@ -81,7 +81,7 @@
                                     </form>
 
                                     <!-- Tombol Tolak -->
-                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST" class="w-full">
+                                    <form action="{{ route('petugas.peminjaman.tolak', $item->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" onclick="return confirm('Yakin ingin menolak pengajuan peminjaman ini?')"
                                             class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2.5 rounded-lg text-sm font-semibold transition shadow-sm inline-flex items-center justify-center gap-2">

@@ -15,9 +15,19 @@
 
         <!-- SIDEBAR -->
         <aside class="w-64 bg-gray-900 text-white flex flex-col hidden md:flex">
-            <div class="p-5 text-xl font-bold tracking-wider border-b border-gray-800">
-                PANEL ADMIN
-            </div>
+            @if(auth()->user()->role === 'admin')
+                <div class="p-5 text-xl font-bold tracking-wider border-b border-gray-800">
+                    PANEL ADMIN
+                </div>
+            @elseif(auth()->user()->role === 'petugas')
+                <div class="p-5 text-xl font-bold tracking-wider border-b border-gray-800">
+                    PANEL PETUGAS
+                </div>
+            @elseif(auth()->user()->role === 'peminjam')
+                <div class="p-5 text-xl font-bold tracking-wider border-b border-gray-800">
+                    PANEL PEMINJAM
+                </div>
+            @endif
 
             <nav class="flex-1 p-4 space-y-2">
                 <!-- MENU KHUSUS ADMIN -->
@@ -67,6 +77,12 @@
                        class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('petugas.laporan.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                         Cetak Laporan
                     </a>
+                @elseif(auth()->user()->role === 'peminjam')
+                    <a href="{{ route('peminjam.dashboard') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.dashboard') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Dashboard</a>
+                    <a href="{{ route('peminjam.katalog.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.katalog.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Katalog Alat</a>
+                    <a href="{{ route('peminjam.peminjaman.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.peminjaman.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Peminjaman Saya</a>
+                    <a href="{{ route('peminjam.riwayat') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.riwayat') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Riwayat Peminjaman</a>
+                    <a href="{{ route('peminjam.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.profil*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @endif
             </nav>
 
@@ -82,7 +98,7 @@
         <div class="flex-1 flex flex-col overflow-y-auto">
 
             <!-- NAVBAR ATAS -->
-            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 z-10">
+            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-6 py-4 z-10">
                 <div class="text-lg font-semibold text-gray-800">
                     @yield('header-title', 'Dashboard')
                 </div>
