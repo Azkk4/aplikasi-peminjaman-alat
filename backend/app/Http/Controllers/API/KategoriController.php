@@ -63,6 +63,9 @@ class KategoriController extends Controller
      */
     public function destroy(Kategori $kategori): JsonResponse
     {
+        if ($kategori->alats()->exists()) {
+            return response()->json(['message' => 'Kategori tidak dapat dihapus karena masih digunakan oleh alat.'], 422);
+        }
         $kategori->delete(); 
         return response()->json([ 
             'message' => 'Kategori berhasil dihapus.' 

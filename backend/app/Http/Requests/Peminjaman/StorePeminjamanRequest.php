@@ -21,7 +21,7 @@ class StorePeminjamanRequest extends FormRequest
         return [ 
             'tgl_kembali_plan' => ['required', 'date', 'date_format:Y-m-d', 'after_or_equal:today'], 
             'items' => ['required', 'array', 'min:1'], 
-            'items.*.alat_id' => ['required', 'integer', Rule::exists('alat', 'id')], 
+            'items.*.alat_id' => ['required', 'integer', 'distinct', Rule::exists('alat', 'id')],
             'items.*.jumlah' => ['required', 'integer', 'min:1'], 
         ]; 
     } 

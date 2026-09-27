@@ -9,6 +9,7 @@ use App\Http\Resources\AlatResource;
 use App\Models\Alat; 
 use Illuminate\Http\JsonResponse; 
 use Illuminate\Support\Facades\DB; 
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 
 class AlatController extends Controller
@@ -76,6 +77,9 @@ class AlatController extends Controller
 
     public function destroy(Alat $alat): JsonResponse 
     { 
+        if ($alat->detailPinjam()->exists()) {
+            return response()->json(['message' => 'Alat tidak dapat dihapus karena sudah digunakan dalam histori peminjaman.'], 422);
+        }
         DB::transaction(function () use ($alat) { 
             if ($alat->gambar) { 
                 Storage::disk('public')->delete($alat->gambar); 

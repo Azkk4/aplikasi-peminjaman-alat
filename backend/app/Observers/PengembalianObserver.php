@@ -20,7 +20,10 @@ class PengembalianObserver
  
     public function created(Pengembalian $pengembalian): void 
     { 
-        $this->catatLog("Memproses pengembalian alat untuk Peminjaman ID: #{$pengembalian->peminjaman_id}"); 
+        $pengembalian->loadMissing('peminjaman.user', 'peminjaman.detailPinjam.alat');
+        $nama = $pengembalian->peminjaman?->user?->name ?? 'User tidak tersedia';
+        $alat = $pengembalian->peminjaman?->detailPinjam->pluck('alat.nama_alat')->filter()->join(', ') ?: 'Alat tidak tersedia';
+        $this->catatLog("Memproses pengembalian {$alat} milik {$nama}");
     } 
  
     public function updated(Pengembalian $pengembalian): void 
@@ -29,13 +32,13 @@ class PengembalianObserver
  
         if (!empty($perubahan)) { 
             $kolom = implode(', ', $perubahan); 
-            $this->catatLog("Merevisi data pengembalian (ID Kembali: #{$pengembalian->id}, Peminjaman ID: #{$pengembalian->peminjaman_id}, Kolom diubah: {$kolom})"); 
+            $this->catatLog("Merevisi data pengembalian (Kolom diubah: {$kolom})");
         } 
     } 
  
     public function deleted(Pengembalian $pengembalian): void 
     { 
-        $this->catatLog("Membatalkan/menghapus riwayat pengembalian (Peminjaman ID: #{$pengembalian->peminjaman_id})"); 
+        $this->catatLog('Membatalkan/menghapus riwayat pengembalian');
     }
 
     /**

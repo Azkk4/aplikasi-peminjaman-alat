@@ -94,6 +94,7 @@ Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam
     Route::post('/peminjaman', [PeminjamController::class, 'ajukanPeminjaman'])->name('peminjaman.store');
     Route::get('/peminjaman', [PeminjamController::class, 'peminjamanSaya'])->name('peminjaman.index');
     Route::get('/peminjaman/{peminjaman}', [PeminjamController::class, 'detailPeminjaman'])->name('peminjaman.show');
+    Route::post('/peminjaman/{peminjaman}/kembalikan', [PeminjamController::class, 'kembalikanPeminjaman'])->name('peminjaman.return');
     Route::get('/riwayat', [PeminjamController::class, 'riwayatPeminjaman'])->name('riwayat');
     Route::get('/profil', [PeminjamController::class, 'profil'])->name('profil');
     Route::put('/profil', [PeminjamController::class, 'updateProfil'])->name('profil.update');

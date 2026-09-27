@@ -9,6 +9,8 @@
     bg-emerald-100 text-emerald-800
 @elseif($status == 'telat')
     bg-red-100 text-red-800
+@elseif($status == 'ditolak')
+    bg-gray-200 text-gray-700
 @else
     bg-gray-100 text-gray-800
 @endif">

@@ -34,8 +34,8 @@ class UpdateUserRequest extends FormRequest
                 Rule::in(['admin', 'petugas', 'peminjam']) 
             ], 
             
-            'no_hp' => ['nullable', 'string', 'max:15'], 
-            'alamat' => ['nullable', 'string'], 
+            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'alamat' => ['nullable', 'string', 'max:1000'],
             'foto_profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'], 
         ]; 
     } 

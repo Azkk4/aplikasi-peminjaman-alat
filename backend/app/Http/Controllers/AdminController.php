@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Validation\Rule;
 
 class AdminController extends Controller
 {
@@ -134,6 +135,11 @@ class AdminController extends Controller
     {
         $alat = Alat::findOrFail($id);
 
+        if ($alat->detailPinjam()->exists()) {
+            return redirect()->route('admin.alat.index')
+                ->with('error', 'Alat tidak dapat dihapus karena sudah digunakan dalam riwayat peminjaman.');
+        }
+
         // Hapus file gambar fisik jika ada
         if ($alat->gambar && file_exists(public_path($alat->gambar))) {
             unlink(public_path($alat->gambar));
@@ -169,20 +175,35 @@ class AdminController extends Controller
     // Menyimpan user baru ke database
     public function storeUser(Request $request)
     {
+        $allowedRoles = $request->user()->isSuperAdmin()
+            ? ['admin', 'petugas', 'peminjam']
+            : ['petugas', 'peminjam'];
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-            'role' => 'required|in:admin,petugas,peminjam',
+            'password' => 'required|string|min:8',
+            'role' => ['required', Rule::in($allowedRoles)],
+            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'alamat' => 'nullable|string|max:1000',
+            'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
-        User::create([
+        $data = [
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
             'no_hp' => $request->no_hp,
-        ]);
+            'alamat' => $request->alamat,
+        ];
+        if ($request->hasFile('foto_profile')) {
+            $directory = public_path('storage/profile');
+            if (! is_dir($directory)) mkdir($directory, 0755, true);
+            $filename = $request->file('foto_profile')->hashName();
+            $request->file('foto_profile')->move($directory, $filename);
+            $data['foto_profile'] = 'storage/profile/' . $filename;
+        }
+        User::create($data);
 
         return redirect()->route('admin.user.index')->with('success', 'User berhasil ditambahkan.');
     }
@@ -197,11 +218,24 @@ class AdminController extends Controller
     public function updateUser(Request $request, $id)
     {
         $user = User::findOrFail($id);
+        $actor = $request->user();
+        if ($user->isSuperAdmin() && ! $actor->isSuperAdmin()) {
+            abort(403, 'Hanya Super Admin yang dapat mengubah Super Admin.');
+        }
+        if ($user->id === $actor->id && $request->input('role') !== $user->role) {
+            abort(403, 'Anda tidak dapat mengubah role diri sendiri.');
+        }
+        $allowedRoles = $actor->isSuperAdmin()
+            ? ['admin', 'petugas', 'peminjam']
+            : ['petugas', 'peminjam'];
 
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
-            'role' => 'required|in:admin,petugas,peminjam',
+            'role' => ['required', Rule::in($allowedRoles)],
+            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'alamat' => 'nullable|string|max:1000',
+            'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
 
         $data = [
@@ -209,10 +243,21 @@ class AdminController extends Controller
             'email' => $request->email,
             'role' => $request->role,
             'no_hp' => $request->no_hp,
+            'alamat' => $request->alamat,
         ];
 
         if ($request->filled('password')) {
+            $request->validate(['password' => 'string|min:8']);
             $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('foto_profile')) {
+            $directory = public_path('storage/profile');
+            if (! is_dir($directory)) mkdir($directory, 0755, true);
+            if ($user->foto_profile && file_exists(public_path($user->foto_profile))) unlink(public_path($user->foto_profile));
+            $filename = $request->file('foto_profile')->hashName();
+            $request->file('foto_profile')->move($directory, $filename);
+            $data['foto_profile'] = 'storage/profile/' . $filename;
         }
 
         $user->update($data);
@@ -224,6 +269,12 @@ class AdminController extends Controller
     public function destroyUser($id)
     {
         $user = User::findOrFail($id);
+        if ($user->id === request()->user()->id || ($user->isSuperAdmin() && ! request()->user()->isSuperAdmin())) {
+            abort(403, 'Akun ini tidak dapat dihapus oleh Anda.');
+        }
+        if ($user->peminjaman()->whereIn('status', ['diajukan', 'dipinjam', 'telat'])->exists()) {
+            return back()->with('error', 'User tidak dapat dihapus karena masih memiliki transaksi aktif.');
+        }
         $user->delete();
 
         return redirect()->route('admin.user.index')->with('success', 'User berhasil dihapus.');
@@ -253,7 +304,7 @@ class AdminController extends Controller
     public function storeKategori(Request $request)
     {
         $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:kategoris,nama_kategori',
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori',
         ]);
 
         Kategori::create([
@@ -276,7 +327,7 @@ class AdminController extends Controller
         $kategori = Kategori::findOrFail($id);
 
         $request->validate([
-            'nama_kategori' => 'required|string|max:255|unique:kategoris,nama_kategori,' . $id,
+            'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,' . $id,
         ]);
 
         $kategori->update([
@@ -338,7 +389,7 @@ class AdminController extends Controller
             'tgl_pinjam'       => 'required|date',
             'tgl_kembali_plan' => 'required|date|after_or_equal:tgl_pinjam',
             'alat_id'          => 'required|array',
-            'alat_id.*'        => 'exists:alats,id',
+            'alat_id.*'        => 'distinct|exists:alat,id',
             'jumlah'           => 'required|array',
             'jumlah.*'         => 'integer|min:1',
         ]);
@@ -381,50 +432,57 @@ class AdminController extends Controller
     // 4. Memperbarui status peminjaman (Misal: dari diajukan -> dipinjam / selesai)
     public function updateStatusPeminjaman(Request $request, $id)
     {
-        $peminjaman = Peminjaman::with('detailPinjam.alat')->findOrFail($id);
-
         $request->validate([
-            'status' => 'required|in:diajukan,dipinjam,selesai,telat',
+            'status' => 'required|in:diajukan,dipinjam,selesai,telat,ditolak',
         ]);
 
-        DB::beginTransaction();
         try {
-            $statusLama = $peminjaman->status;
-            $statusBaru = $request->status;
+            DB::transaction(function () use ($request, $id) {
+                $peminjaman = Peminjaman::with('detailPinjam')
+                    ->lockForUpdate()
+                    ->findOrFail($id);
+                $transitions = [
+                    'diajukan' => ['dipinjam', 'ditolak'],
+                    'dipinjam' => ['selesai', 'telat'],
+                    'telat' => ['selesai'],
+                    'selesai' => [],
+                    'ditolak' => [],
+                ];
+                $statusLama = $peminjaman->status;
+                $statusBaru = $request->status;
+                if (!in_array($statusBaru, $transitions[$statusLama] ?? [], true)) {
+                    throw new \RuntimeException('Perubahan status tidak diizinkan.');
+                }
 
-            if ($statusLama != 'dipinjam' && $statusBaru == 'dipinjam') {
-                foreach ($peminjaman->detailPinjam as $detail) {
-                    $alat = $detail->alat;
-                    if ($alat->stok < $detail->jumlah) {
-                        throw new Exception("Stok alat ({$alat->nama_alat}) tidak mencukupi untuk dipinjam.");
+                if ($statusBaru === 'dipinjam') {
+                    foreach ($peminjaman->detailPinjam->sortBy('alat_id') as $detail) {
+                        $alat = Alat::lockForUpdate()->findOrFail($detail->alat_id);
+                        if ($alat->status_kondisi !== 'Baik' || $alat->stok < $detail->jumlah) {
+                            throw new Exception("Stok alat ({$alat->nama_alat}) tidak mencukupi.");
+                        }
+                        $alat->decrement('stok', $detail->jumlah);
                     }
-                    $alat->decrement('stok', $detail->jumlah);
                 }
-            } elseif ($statusLama == 'dipinjam' && $statusBaru == 'selesai') {
-                foreach ($peminjaman->detailPinjam as $detail) {
-                    $detail->alat->increment('stok', $detail->jumlah);
+
+                if ($statusBaru === 'selesai') {
+                    throw new \RuntimeException('Gunakan proses pengembalian untuk menyelesaikan peminjaman.');
                 }
-            }
 
-            $peminjaman->update(['status' => $statusBaru]);
-
-            DB::commit();
+                $peminjaman->update(['status' => $statusBaru]);
+            });
             return redirect()->route('admin.peminjaman.index')->with('success', 'Status peminjaman berhasil diperbarui.');
         } catch (Exception $e) {
-            DB::rollBack();
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', $e instanceof \RuntimeException ? $e->getMessage() : 'Status peminjaman gagal diperbarui.');
         }
     }
 
     // 5. Menghapus data peminjaman
     public function destroyPeminjaman($id)
     {
-        $peminjaman = Peminjaman::with('detailPinjam')->findOrFail($id);
+        $peminjaman = Peminjaman::with('pengembalian')->findOrFail($id);
 
-        if ($peminjaman->status == 'dipinjam') {
-            foreach ($peminjaman->detailPinjam as $detail) {
-                $detail->alat->increment('stok', $detail->jumlah);
-            }
+        if ($peminjaman->pengembalian()->exists() || in_array($peminjaman->status, ['dipinjam', 'selesai', 'telat'], true)) {
+            return back()->with('error', 'Peminjaman yang sudah diproses tidak dapat dihapus karena diperlukan untuk histori dan laporan.');
         }
 
         $peminjaman->delete();

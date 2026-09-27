@@ -17,7 +17,7 @@ class LaporanController extends Controller
         $validator = Validator::make($request->all(), [ 
             'start_date' => ['nullable', 'date', 'date_format:Y-m-d'], 
             'end_date'   => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:start_date'], 
-            'status'     => ['nullable', 'string', 'in:diajukan,dipinjam,selesai,telat'], 
+            'status'     => ['nullable', 'string', 'in:diajukan,dipinjam,selesai,telat,ditolak'],
             'per_page'   => ['nullable', 'integer', 'min:1', 'max:100'], 
         ]); 
         if ($validator->fails()) { 
@@ -29,8 +29,11 @@ class LaporanController extends Controller
         // 2. Eager loading untuk mencegah masalah N+1 Query 
         $query = Peminjaman::with(['user', 'detailPinjam.alat', 'pengembalian.petugas']); 
         // Filter: Rentang Tanggal Pinjam 
-        $query->when($request->filled('start_date') && $request->filled('end_date'), function ($q) use ($request) { 
-            $q->whereBetween('tgl_pinjam', [$request->start_date, $request->end_date]); 
+        $query->when($request->filled('start_date'), function ($q) use ($request) {
+            $q->whereDate('tgl_pinjam', '>=', $request->start_date);
+        });
+        $query->when($request->filled('end_date'), function ($q) use ($request) {
+            $q->whereDate('tgl_pinjam', '<=', $request->end_date);
         }); 
         // Filter: Status Peminjaman 
         $query->when($request->filled('status'), function ($q) use ($request) { 

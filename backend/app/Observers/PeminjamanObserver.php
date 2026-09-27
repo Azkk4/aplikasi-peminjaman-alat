@@ -21,23 +21,25 @@ class PeminjamanObserver
     public function created(Peminjaman $peminjaman): void
     { 
         $namaPeminjam = $peminjaman->user?->name ?? 'User'; 
-        $this->catatLog("Peminjam ({$namaPeminjam}) membuat permohonan peminjaman baru (ID: #{$peminjaman->id})"); 
+        $this->catatLog("Peminjam ({$namaPeminjam}) membuat permohonan peminjaman baru");
     } 
  
     public function updated(Peminjaman $peminjaman): void 
     { 
+        $namaPeminjam = $peminjaman->user?->name ?? 'User tidak tersedia';
         if ($peminjaman->wasChanged('status')) { 
-            $this->catatLog("Status peminjaman (ID: #{$peminjaman->id}) berubah menjadi: '{$peminjaman->status}'"); 
+            $this->catatLog("Status peminjaman milik {$namaPeminjam} berubah menjadi: '{$peminjaman->status}'");
         } else { 
             if (!empty($peminjaman->getChanges())) { 
-                $this->catatLog("Memperbarui detail data peminjaman (ID: #{$peminjaman->id})"); 
+                $this->catatLog("Memperbarui detail peminjaman milik {$namaPeminjam}");
             } 
         } 
     } 
  
     public function deleted(Peminjaman $peminjaman): void 
     { 
-        $this->catatLog("Membatalkan/menghapus permohonan peminjaman (ID: #{$peminjaman->id})"); 
+        $namaPeminjam = $peminjaman->user?->name ?? 'User tidak tersedia';
+        $this->catatLog("Membatalkan/menghapus permohonan peminjaman milik {$namaPeminjam}");
     }
 
     /**

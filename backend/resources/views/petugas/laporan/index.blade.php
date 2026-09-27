@@ -6,7 +6,7 @@
 @section('content')
 <div class="space-y-6">
     <!-- Card Filter Laporan -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5">
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-5 print-hidden">
         <h3 class="text-lg font-bold text-gray-800 mb-4">Filter Periode & Status Laporan</h3>
         
         <form action="{{ route('petugas.laporan.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">

@@ -91,7 +91,7 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403); 
         } 
  
-        if ($peminjaman->status !== 'diajukan') { 
+        if ($peminjaman->status !== 'diajukan' || $peminjaman->pengembalian()->exists()) {
             return response()->json([ 
                 'message' => "Peminjaman tidak dapat diubah karena status saat ini: {$peminjaman->status}." 
             ], 400); 
@@ -138,7 +138,7 @@ class PeminjamanController extends Controller
             return response()->json(['message' => 'Akses ditolak.'], 403); 
         }
 
-        if ($peminjaman->status !== 'diajukan') { 
+        if ($peminjaman->status !== 'diajukan' || $peminjaman->pengembalian()->exists()) {
             return response()->json(['message' => 'Peminjaman tidak dapat dibatalkan.'], 400); 
         } 
  
@@ -162,9 +162,12 @@ class PeminjamanController extends Controller
  
         try { 
             DB::transaction(function () use ($peminjaman) { 
-                $peminjaman->update(['status' => 'dipinjam']); 
- 
-                foreach ($peminjaman->detailPinjam as $detail) { 
+                $peminjaman = Peminjaman::with('detailPinjam')->lockForUpdate()->findOrFail($peminjaman->id);
+                if ($peminjaman->status !== 'diajukan') {
+                    throw new Exception("Persetujuan gagal. Status saat ini: {$peminjaman->status}.");
+                }
+
+                foreach ($peminjaman->detailPinjam->sortBy('alat_id') as $detail) {
                     // Mengunci baris alat demi validasi final sebelum stok dikurangi 
                     $alat = Alat::lockForUpdate()->findOrFail($detail->alat_id); 
                     
@@ -174,6 +177,7 @@ class PeminjamanController extends Controller
  
                     $alat->decrement('stok', $detail->jumlah); 
                 } 
+                $peminjaman->update(['status' => 'dipinjam']);
             }); 
  
             return response()->json([ 

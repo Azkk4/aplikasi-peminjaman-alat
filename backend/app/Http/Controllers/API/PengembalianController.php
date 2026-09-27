@@ -39,7 +39,7 @@ class PengembalianController extends Controller
             $pengembalian = DB::transaction(function () use ($request) { 
                 // Kunci baris peminjaman ini selama transaksi agar tidak dimanipulasi proses lain 
                 
-                $peminjaman = Peminjaman::with('detailPinjam')->lockForUpdate()->find($request->peminjaman_id);
+                $peminjaman = Peminjaman::with('detailPinjam')->lockForUpdate()->findOrFail($request->peminjaman_id);
 
                  // Guarding: Pastikan statusnya sedang dipinjam 
                 if ($peminjaman->status !== 'dipinjam') { 
@@ -66,7 +66,7 @@ class PengembalianController extends Controller
  
                 // 3. Kembalikan (tambah) stok alat berdasarkan detail_pinjam 
 
-                foreach ($peminjaman->detailPinjam as $detail) { 
+                foreach ($peminjaman->detailPinjam->sortBy('alat_id') as $detail) {
                     $alat = Alat::lockForUpdate()->find($detail->alat_id); 
 
                     // increment() otomatis menambah nilai pada field yang ditentukan 
@@ -75,9 +75,10 @@ class PengembalianController extends Controller
                 }
 
                  // Opsional: Catat ke log aktivitas petugas 
-                auth()->user()->logAktivitas()->create([ 
-                    'aktivitas' => "Memproses pengembalian peminjaman ID: #{$peminjaman->id} dengan status akhir: {$statusPeminjamanBaru}." 
-                ]); 
+                $namaPeminjam = $peminjaman->user?->name ?? 'User tidak tersedia';
+                auth()->user()->logAktivitas()->create([
+                    'aktivitas' => "Memproses pengembalian milik {$namaPeminjam} dengan status akhir: {$statusPeminjamanBaru}."
+                ]);
  
                 // Load relasi agar response JSON lebih informatif 
                 return $pengembalian->load(['peminjaman.user', 'petugas']); 
@@ -153,7 +154,10 @@ class PengembalianController extends Controller
  
                 // Log Aktivitas jika metode/relasi tersedia 
 
-                auth()->user()->logAktivitas()?->create(['aktivitas' => "Membatalkan pengembalian ID: #{$pengembalian->id}"]); 
+                $namaPeminjam = $peminjaman->user?->name ?? 'User tidak tersedia';
+                auth()->user()->logAktivitas()?->create([
+                    'aktivitas' => "Membatalkan pengembalian milik {$namaPeminjam}",
+                ]);
  
                 $pengembalian->delete(); 
             }); 

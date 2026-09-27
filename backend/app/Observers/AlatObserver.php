@@ -20,7 +20,7 @@ class AlatObserver
 
     public function created(Alat $alat): void 
     { 
-        $this->catatLog("Menambahkan master data alat baru: {$alat->nama_alat} (ID: {$alat->id})"); 
+        $this->catatLog("Menambahkan master data alat baru: {$alat->nama_alat}");
     } 
  
     public function updated(Alat $alat): void 
@@ -35,7 +35,7 @@ class AlatObserver
  
     public function deleted(Alat $alat): void 
     { 
-        $this->catatLog("Menghapus master data alat: {$alat->nama_alat} (ID: {$alat->id})"); 
+        $this->catatLog("Menghapus master data alat: {$alat->nama_alat}");
     } 
 
     /**

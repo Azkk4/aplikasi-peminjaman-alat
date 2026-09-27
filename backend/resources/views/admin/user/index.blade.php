@@ -43,6 +43,7 @@
             <thead>
                 <tr class="bg-gray-100 text-gray-600 text-sm uppercase tracking-wider">
                     <th class="py-3 px-4 border-b">Nama</th>
+                    <th class="py-3 px-4 border-b">Foto</th>
                     <th class="py-3 px-4 border-b">Email</th>
                     <th class="py-3 px-4 border-b">Role / Hak Akses</th>
                     <th class="py-3 px-4 border-b">No. HP</th>
@@ -53,6 +54,7 @@
                 @forelse($users as $user)
                 <tr class="hover:bg-gray-50 transition">
                     <td class="py-3 px-4 border-b font-medium text-gray-900">{{ $user->name }}</td>
+                    <td class="py-3 px-4 border-b"><img src="{{ $user->profile_photo_url }}" alt="Foto profil {{ $user->name }}" class="h-10 w-10 rounded-full object-cover"></td>
                     <td class="py-3 px-4 border-b">{{ $user->email }}</td>
                     <td class="py-3 px-4 border-b">
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full
@@ -83,7 +85,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5" class="py-4 text-center text-gray-500">Belum ada data pengguna.</td>
+                    <td colspan="6" class="py-4 text-center text-gray-500">Belum ada data pengguna.</td>
                 </tr>
                 @endforelse
             </tbody>

@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable; 
     protected $table = 'users'; 
     protected $fillable = [ 
-        'name', 'email', 'password', 'role', 'no_hp', 'alamat', 
+        'name', 'email', 'password', 'role', 'is_super_admin', 'no_hp', 'alamat',
         'foto_profile' 
     ]; 
     protected $hidden = [ 
@@ -25,8 +25,14 @@ class User extends Authenticatable
         return [ 
             'email_verified_at' => 'datetime', 
             'password' => 'hashed', // Laravel otomatis meng-hash teks apapun yang masuk ke properti password! 
+            'is_super_admin' => 'boolean',
         ]; 
     } 
+
+    public function isSuperAdmin(): bool
+    {
+        return $this->role === 'admin' && (bool) $this->is_super_admin;
+    }
  
     public function peminjaman(): HasMany { 
         return $this->hasMany(Peminjaman::class); 
@@ -35,6 +41,15 @@ class User extends Authenticatable
     public function logAktivitas(): HasMany { 
         return $this->hasMany(LogAktivitas::class); 
     } 
+
+    public function getProfilePhotoUrlAttribute(): string
+    {
+        if ($this->foto_profile && file_exists(public_path($this->foto_profile))) {
+            return asset($this->foto_profile);
+        }
+
+        return asset('images/no-image.svg');
+    }
 
 
 }

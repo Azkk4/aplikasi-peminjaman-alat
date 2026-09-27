@@ -36,7 +36,7 @@ class PetugasController extends Controller
 
             // Pastikan statusnya memang masih diajukan
             if ($peminjaman->status == 'diajukan') {
-                $peminjaman->delete();
+                $peminjaman->update(['status' => 'ditolak']);
                 return redirect()->back()->with('success', 'Pengajuan peminjaman berhasil ditolak.');
             }
 
@@ -81,48 +81,47 @@ class PetugasController extends Controller
     public function prosesPengembalian(Request $request, $peminjamanId)
     {
         $request->validate([
-            'kondisi_kembali' => 'required|string',
-            'denda' => 'nullable|integer',
+            'kondisi_kembali' => 'required|string|max:100',
+            'denda' => 'nullable|integer|min:0',
         ]);
 
-        DB::beginTransaction();
-
         try {
-            $peminjaman = Peminjaman::with('detailPinjam')
-                ->findOrFail($peminjamanId);
+            DB::transaction(function () use ($request, $peminjamanId) {
+                $peminjaman = Peminjaman::with('detailPinjam')
+                    ->lockForUpdate()
+                    ->findOrFail($peminjamanId);
 
-            // Simpan data pengembalian
-            Pengembalian::create([
-                'peminjaman_id'    => $peminjaman->id,
-                'tgl_kembali'      => now(),
-                'kondisi_kembali'  => $request->kondisi_kembali,
-                'denda'            => $request->denda ?? 0,
-                'petugas_id'       => auth()->id(),
-            ]);
+                if ($peminjaman->status !== 'dipinjam' || $peminjaman->pengembalian()->exists()) {
+                    throw new \RuntimeException('Peminjaman tidak memenuhi syarat untuk dikembalikan.');
+                }
 
-            $peminjaman->update([
-                'status' => 'selesai'
-            ]);
+                $details = $peminjaman->detailPinjam->sortBy('alat_id');
+                foreach ($details as $detail) {
+                    $alat = Alat::lockForUpdate()->findOrFail($detail->alat_id);
+                    $alat->increment('stok', $detail->jumlah);
+                }
 
-            // Kembalikan stok alat ke inventaris
-            foreach ($peminjaman->detailPinjam as $detail) {
-                $alat = Alat::findOrFail($detail->alat_id);
-                $alat->stok += $detail->jumlah;
-                $alat->save();
-            }
+                Pengembalian::create([
+                    'peminjaman_id' => $peminjaman->id,
+                    'tgl_kembali' => now(),
+                    'kondisi_kembali' => $request->kondisi_kembali,
+                    'denda' => $request->integer('denda', 0),
+                    'petugas_id' => auth()->id(),
+                ]);
 
-            DB::commit();
+                $peminjaman->update(['status' => 'selesai']);
+            });
 
             return redirect()->back()->with(
                 'success',
                 'Pengembalian berhasil dicatat dan stok dipulihkan.'
             );
         } catch (\Exception $e) {
-            DB::rollback();
-
             return redirect()->back()->with(
                 'error',
-                'Terjadi kesalahan: ' . $e->getMessage()
+                $e instanceof \RuntimeException
+                    ? $e->getMessage()
+                    : 'Pengembalian gagal diproses.'
             );
         }
     }
@@ -148,9 +147,14 @@ class PetugasController extends Controller
     // Menampilkan laporan peminjaman & pengembalian dengan filter
     public function indexLaporan(Request $request)
     {
-        $tglMulai = $request->input('tgl_mulai');
-        $tglSelesai = $request->input('tgl_selesai');
-        $status = $request->input('status');
+        $filters = $request->validate([
+            'tgl_mulai' => ['nullable', 'date', 'date_format:Y-m-d'],
+            'tgl_selesai' => ['nullable', 'date', 'date_format:Y-m-d', 'after_or_equal:tgl_mulai'],
+            'status' => ['nullable', 'in:diajukan,dipinjam,selesai,telat,ditolak'],
+        ]);
+        $tglMulai = $filters['tgl_mulai'] ?? null;
+        $tglSelesai = $filters['tgl_selesai'] ?? null;
+        $status = $filters['status'] ?? null;
 
         $laporans = Peminjaman::with(['user', 'detailPinjam.alat', 'pengembalian'])
             ->when($tglMulai, function ($query, $tglMulai) {

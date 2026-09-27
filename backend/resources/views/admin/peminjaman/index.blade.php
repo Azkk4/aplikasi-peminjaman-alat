@@ -80,6 +80,7 @@
                     <td class="py-3 px-4 border-b">
                         <div class="flex flex-col space-y-2">
                             <!-- Form Ubah Status Cepat -->
+                            @if(!in_array($peminjaman->status, ['selesai', 'ditolak']))
                             <form action="{{ route('admin.peminjaman.updateStatus', $peminjaman->id) }}" method="POST" class="flex items-center space-x-1">
                                 @csrf
                                 @method('PUT')
@@ -88,8 +89,10 @@
                                     <option value="dipinjam" {{ $peminjaman->status == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
                                     <option value="selesai" {{ $peminjaman->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
                                     <option value="telat" {{ $peminjaman->status == 'telat' ? 'selected' : '' }}>Telat</option>
+                                    <option value="ditolak" {{ $peminjaman->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                                 </select>
                             </form>
+                            @endif
 
                             <!-- Tombol Hapus -->
                             <form action="{{ route('admin.peminjaman.destroy', $peminjaman->id) }}" method="POST"

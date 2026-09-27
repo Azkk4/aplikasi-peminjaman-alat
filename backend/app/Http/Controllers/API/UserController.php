@@ -51,6 +51,13 @@ class UserController extends Controller
     } 
     public function update(UpdateUserRequest $request, User $user): JsonResponse 
     { 
+        $actor = $request->user();
+        if (($user->isSuperAdmin() || $user->id === $actor->id) && $request->input('role') !== $user->role) {
+            return response()->json(['message' => 'Perubahan role tidak diizinkan.'], 403);
+        }
+        if ($request->input('role') === 'admin' && ! $actor->isSuperAdmin()) {
+            return response()->json(['message' => 'Hanya Super Admin yang dapat menetapkan role Admin.'], 403);
+        }
         $data = collect($request->validated()); 
         DB::transaction(function () use ($request, $data, $user) { 
             if ($data->get('password')) { 
@@ -74,6 +81,9 @@ class UserController extends Controller
     } 
     public function destroy(User $user): JsonResponse 
     { 
+        if ($user->id === request()->user()->id || $user->isSuperAdmin() || $user->peminjaman()->whereIn('status', ['diajukan', 'dipinjam', 'telat'])->exists()) {
+            return response()->json(['message' => 'User tidak dapat dihapus karena dilindungi atau masih memiliki transaksi aktif.'], 422);
+        }
         DB::transaction(function () use ($user) { 
             if ($user->foto_profile) { 
                 Storage::disk('public')->delete($user->foto_profile); 
