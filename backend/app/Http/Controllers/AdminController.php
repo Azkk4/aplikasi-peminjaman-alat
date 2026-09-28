@@ -309,9 +309,15 @@ class AdminController extends Controller
             'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori',
         ]);
 
-        Kategori::create([
-            'nama_kategori' => $request->nama_kategori,
-        ]);
+        try {
+            Kategori::create(['nama_kategori' => $request->nama_kategori]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            if ($exception->getCode() === '23000') {
+                return back()->withErrors(['nama_kategori' => 'Nama kategori sudah digunakan.'])->withInput();
+            }
+
+            return back()->withInput()->with('error', 'Kategori gagal disimpan. Silakan coba kembali.');
+        }
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil ditambahkan.');
     }
@@ -332,9 +338,15 @@ class AdminController extends Controller
             'nama_kategori' => 'required|string|max:255|unique:kategori,nama_kategori,' . $id,
         ]);
 
-        $kategori->update([
-            'nama_kategori' => $request->nama_kategori,
-        ]);
+        try {
+            $kategori->update(['nama_kategori' => $request->nama_kategori]);
+        } catch (\Illuminate\Database\QueryException $exception) {
+            if ($exception->getCode() === '23000') {
+                return back()->withErrors(['nama_kategori' => 'Nama kategori sudah digunakan.'])->withInput();
+            }
+
+            return back()->withInput()->with('error', 'Kategori gagal diperbarui. Silakan coba kembali.');
+        }
 
         return redirect()->route('admin.kategori.index')->with('success', 'Kategori berhasil diperbarui.');
     }
@@ -435,53 +447,6 @@ class AdminController extends Controller
         }
     }
 
-    // 4. Memperbarui status peminjaman (Misal: dari diajukan -> dipinjam / selesai)
-    public function updateStatusPeminjaman(Request $request, $id)
-    {
-        $request->validate([
-            'status' => 'required|in:diajukan,dipinjam,selesai,telat,ditolak',
-        ]);
-
-        try {
-            DB::transaction(function () use ($request, $id) {
-                $peminjaman = Peminjaman::with('detailPinjam')
-                    ->lockForUpdate()
-                    ->findOrFail($id);
-                $transitions = [
-                    'diajukan' => ['dipinjam', 'ditolak'],
-                    'dipinjam' => ['selesai', 'telat'],
-                    'telat' => ['selesai'],
-                    'selesai' => [],
-                    'ditolak' => [],
-                ];
-                $statusLama = $peminjaman->status;
-                $statusBaru = $request->status;
-                if (!in_array($statusBaru, $transitions[$statusLama] ?? [], true)) {
-                    throw new \RuntimeException('Perubahan status tidak diizinkan.');
-                }
-
-                if ($statusBaru === 'dipinjam') {
-                    foreach ($peminjaman->detailPinjam->sortBy('alat_id') as $detail) {
-                        $alat = Alat::lockForUpdate()->findOrFail($detail->alat_id);
-                        if ($alat->status_kondisi !== 'Baik' || $alat->stok < $detail->jumlah) {
-                            throw new Exception("Stok alat ({$alat->nama_alat}) tidak mencukupi.");
-                        }
-                        $alat->decrement('stok', $detail->jumlah);
-                    }
-                }
-
-                if ($statusBaru === 'selesai') {
-                    throw new \RuntimeException('Gunakan proses pengembalian untuk menyelesaikan peminjaman.');
-                }
-
-                $peminjaman->update(['status' => $statusBaru]);
-            });
-            return redirect()->route('admin.peminjaman.index')->with('success', 'Status peminjaman berhasil diperbarui.');
-        } catch (Exception $e) {
-            return back()->with('error', $e instanceof \RuntimeException ? $e->getMessage() : 'Status peminjaman gagal diperbarui.');
-        }
-    }
-
     // 5. Menghapus data peminjaman
     public function destroyPeminjaman($id)
     {
@@ -521,5 +486,24 @@ class AdminController extends Controller
             ->withQueryString();
 
         return view('admin.pengembalian.index', compact('peminjamans', 'search'));
+    }
+
+    public function editPengembalian(Pengembalian $pengembalian)
+    {
+        $pengembalian->load(['peminjaman.user', 'peminjaman.detailPinjam.alat', 'petugas']);
+
+        return view('admin.pengembalian.edit', compact('pengembalian'));
+    }
+
+    public function updatePengembalian(Request $request, Pengembalian $pengembalian)
+    {
+        $data = $request->validate([
+            'kondisi_kembali' => ['required', Rule::in(['Baik', 'Rusak Ringan', 'Rusak Berat'])],
+            'denda' => ['required', 'integer', 'min:0'],
+        ]);
+
+        $pengembalian->update($data);
+
+        return redirect()->route('admin.pengembalian.index')->with('success', 'Data pengembalian berhasil diperbarui.');
     }
 }

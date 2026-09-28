@@ -51,10 +51,11 @@
                     <td class="py-3 px-4 border-b">{{ $user->email }}</td>
                     <td class="py-3 px-4 border-b">
                         <span class="px-2.5 py-1 text-xs font-semibold rounded-full
-                        @if($user->role == 'admin') bg-purple-100 text-purple-800
+                        @if($user->isSuperAdmin()) bg-amber-100 text-amber-900
+                        @elseif($user->role == 'admin') bg-purple-100 text-purple-800
                         @elseif($user->role == 'petugas') bg-blue-100 text-blue-800
                         @else bg-green-100 text-green-800 @endif">
-                            {{ ucfirst($user->role) }}
+                            {{ $user->isSuperAdmin() ? 'Super Admin' : ucfirst($user->role) }}
                         </span>
                     </td>
                     <td class="py-3 px-4 border-b">{{ $user->no_hp ?? '-' }}</td>
@@ -66,7 +67,7 @@
                                 Edit
                             </a>
                             <!-- Tombol Hapus -->
-                            <form action="{{ route('admin.user.destroy', $user->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus user ini?')">
+                            <form action="{{ route('admin.user.destroy', $user->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus user?" data-confirm-message="Akun {{ $user->name }} akan dihapus jika tidak memiliki transaksi aktif.">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">

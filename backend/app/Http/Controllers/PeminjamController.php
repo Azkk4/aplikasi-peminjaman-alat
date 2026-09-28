@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Alat;
 use App\Models\Peminjaman;
 use App\Models\DetailPinjam;
-use App\Models\Pengembalian;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -109,7 +108,7 @@ class PeminjamController extends Controller
     {
         $peminjamans = Peminjaman::with('detailPinjam.alat')
             ->where('user_id', auth()->id())
-            ->whereIn('status', ['selesai', 'telat'])
+            ->where('status', 'selesai')
             ->latest()
             ->paginate(10);
 
@@ -136,38 +135,21 @@ class PeminjamController extends Controller
 
     public function kembalikanPeminjaman(Request $request, Peminjaman $peminjaman)
     {
-        $request->validate([
-            'kondisi_kembali' => ['required', 'string', 'max:255'],
-        ]);
-
         try {
-            DB::transaction(function () use ($request, $peminjaman) {
-                $locked = Peminjaman::with('detailPinjam')
-                    ->lockForUpdate()
-                    ->findOrFail($peminjaman->id);
+            DB::transaction(function () use ($peminjaman) {
+                $locked = Peminjaman::lockForUpdate()->findOrFail($peminjaman->id);
 
                 if ($locked->user_id !== auth()->id()) {
                     abort(403);
                 }
-                if ($locked->status !== 'dipinjam' || $locked->pengembalian()->exists()) {
-                    throw new \RuntimeException('Peminjaman ini tidak memenuhi syarat untuk dikembalikan.');
+                if (! in_array($locked->status, ['dipinjam', 'telat'], true) || $locked->pengembalian_diajukan_at || $locked->pengembalian()->exists()) {
+                    throw new \RuntimeException('Pengajuan pengembalian sudah dikirim atau peminjaman tidak memenuhi syarat.');
                 }
 
-                foreach ($locked->detailPinjam->sortBy('alat_id') as $detail) {
-                    Alat::lockForUpdate()->findOrFail($detail->alat_id)->increment('stok', $detail->jumlah);
-                }
-
-                Pengembalian::create([
-                    'peminjaman_id' => $locked->id,
-                    'tgl_kembali' => now(),
-                    'kondisi_kembali' => $request->kondisi_kembali,
-                    'denda' => 0,
-                    'petugas_id' => auth()->id(),
-                ]);
-                $locked->update(['status' => now()->greaterThan($locked->tgl_kembali_plan) ? 'telat' : 'selesai']);
+                $locked->update(['pengembalian_diajukan_at' => now()]);
             });
 
-            return redirect()->route('peminjam.peminjaman.show', $peminjaman)->with('success', 'Pengembalian berhasil dicatat.');
+            return redirect()->route('peminjam.peminjaman.show', $peminjaman)->with('success', 'Pengajuan pengembalian berhasil dikirim kepada petugas.');
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }

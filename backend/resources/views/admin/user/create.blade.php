@@ -54,7 +54,8 @@
 
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Foto Profil</label>
-            <input type="file" name="foto_profile" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+            <input type="file" name="foto_profile" accept="image/jpeg,image/png,image/webp" data-crop-input="foto_profile" data-crop-aspect="square" class="w-full text-sm">
+            <img data-crop-preview="foto_profile" alt="Pratinjau foto profil" class="mt-3 hidden h-20 w-20 rounded-full object-cover">
             @include('components.field-error', ['field' => 'foto_profile'])
         </div>
 

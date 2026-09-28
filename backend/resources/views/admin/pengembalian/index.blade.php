@@ -37,6 +37,7 @@
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Denda (Rp)</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Petugas</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
@@ -90,10 +91,15 @@
                     <td class="py-3 px-4">
                         @include('components.status-badge', ['status' => $peminjaman->status])
                     </td>
+                    <td class="py-3 px-4">
+                        @if($peminjaman->pengembalian)
+                            <a href="{{ route('admin.pengembalian.edit', $peminjaman->pengembalian) }}" class="inline-flex rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-600">Edit Kondisi/Denda</a>
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="py-4 text-center text-gray-500">Belum ada data pengembalian.</td>
+                    <td colspan="9" class="py-4 text-center text-gray-500">Belum ada data pengembalian.</td>
                 </tr>
                 @endforelse
             </tbody>

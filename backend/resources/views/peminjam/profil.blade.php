@@ -28,10 +28,10 @@
         @method('PUT')
 
         <div class="mb-5 flex items-center gap-4">
-            <img src="{{ auth()->user()->profile_photo_url }}" alt="Foto profil {{ auth()->user()->name }}" class="h-20 w-20 rounded-full object-cover ring-2 ring-emerald-100">
+            <img src="{{ auth()->user()->profile_photo_url }}" data-crop-preview="foto_profile" alt="Foto profil {{ auth()->user()->name }}" class="h-20 w-20 rounded-full object-cover ring-2 ring-emerald-100">
             <div class="flex-1">
                 <label for="foto_profile" class="block text-sm font-semibold text-gray-700">Foto profil</label>
-                <input id="foto_profile" name="foto_profile" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-sm text-gray-600">
+                <input id="foto_profile" name="foto_profile" type="file" accept="image/jpeg,image/png,image/webp" data-crop-input="foto_profile" data-crop-aspect="square" class="mt-2 block w-full text-sm text-gray-600">
                 @include('components.field-error', ['field' => 'foto_profile'])
             </div>
         </div>

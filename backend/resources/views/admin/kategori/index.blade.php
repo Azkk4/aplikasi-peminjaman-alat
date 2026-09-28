@@ -51,7 +51,7 @@
                                 class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.kategori.destroy', $kategori->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
+                            <form action="{{ route('admin.kategori.destroy', $kategori->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus kategori?" data-confirm-message="Kategori {{ $kategori->nama_kategori }} akan dihapus jika tidak digunakan.">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit"

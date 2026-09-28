@@ -110,7 +110,7 @@
                         <tr class="hover:bg-gray-50 transition border-b">
                             <td class="py-3 px-5 text-xs text-gray-600">{{ $log->created_at->format('d M Y H:i') }}</td>
                             <td class="py-3 px-5 font-medium text-gray-900">{{ $log->user->name ?? 'Sistem' }}</td>
-                            <td class="py-3 px-5">{{ $log->aktivitas }}</td>
+                            <td class="py-3 px-5">{{ $log->display_activity }}</td>
                         </tr>
                     @empty
                         <tr>

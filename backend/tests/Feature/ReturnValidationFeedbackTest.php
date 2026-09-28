@@ -6,6 +6,7 @@ use App\Models\Alat;
 use App\Models\DetailPinjam;
 use App\Models\Kategori;
 use App\Models\Peminjaman;
+use App\Models\Pengembalian;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -17,6 +18,7 @@ class ReturnValidationFeedbackTest extends TestCase
     public function test_petugas_return_form_renders_required_field_error(): void
     {
         [$petugas, , $peminjaman] = $this->createBorrowing();
+        $peminjaman->update(['pengembalian_diajukan_at' => now()]);
 
         $this->actingAs($petugas)
             ->from(route('petugas.pengembalian.index'))
@@ -32,18 +34,97 @@ class ReturnValidationFeedbackTest extends TestCase
         $this->assertDatabaseMissing('pengembalian', ['peminjaman_id' => $peminjaman->id]);
     }
 
-    public function test_peminjam_return_form_renders_required_field_error(): void
+    public function test_peminjam_request_does_not_set_condition_or_process_return(): void
     {
-        [, $borrower, $peminjaman] = $this->createBorrowing();
+        [, $borrower, $peminjaman, $alat] = $this->createBorrowing();
 
         $this->actingAs($borrower)
             ->from(route('peminjam.peminjaman.show', $peminjaman))
             ->followingRedirects()
-            ->post(route('peminjam.peminjaman.return', $peminjaman), ['kondisi_kembali' => ''])
+            ->post(route('peminjam.peminjaman.return', $peminjaman), [
+                'kondisi_kembali' => 'Rusak Berat',
+                'denda' => '999999',
+                'status' => 'selesai',
+            ])
             ->assertOk()
-            ->assertSee('kondisi pengembalian wajib diisi.');
+            ->assertSee('Pengajuan pengembalian berhasil dikirim kepada petugas.');
 
         $this->assertDatabaseMissing('pengembalian', ['peminjaman_id' => $peminjaman->id]);
+        $this->assertDatabaseHas('peminjaman', [
+            'id' => $peminjaman->id,
+            'status' => 'dipinjam',
+        ]);
+        $this->assertNotNull($peminjaman->fresh()->pengembalian_diajukan_at);
+        $this->assertSame(0, $alat->fresh()->stok);
+    }
+
+    public function test_staff_acceptance_finalizes_return_and_restores_stock_only_once(): void
+    {
+        [$petugas, , $peminjaman, $alat] = $this->createBorrowing();
+        $peminjaman->update([
+            'status' => 'telat',
+            'pengembalian_diajukan_at' => now(),
+        ]);
+
+        $payload = [
+            '_return_id' => $peminjaman->id,
+            'kondisi_kembali' => 'Rusak Ringan',
+            'denda' => '5000',
+        ];
+
+        $this->actingAs($petugas)
+            ->post(route('petugas.pengembalian.proses', $peminjaman), $payload)
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('peminjaman', ['id' => $peminjaman->id, 'status' => 'selesai']);
+        $this->assertDatabaseHas('pengembalian', [
+            'peminjaman_id' => $peminjaman->id,
+            'kondisi_kembali' => 'Rusak Ringan',
+            'denda' => 5000,
+        ]);
+        $this->assertSame(1, $alat->fresh()->stok);
+
+        $this->actingAs($petugas)
+            ->post(route('petugas.pengembalian.proses', $peminjaman), $payload)
+            ->assertRedirect();
+
+        $this->assertSame(1, $alat->fresh()->stok);
+        $this->assertDatabaseCount('pengembalian', 1);
+    }
+
+    public function test_admin_can_edit_existing_return_condition_and_fine_without_changing_stock_or_status(): void
+    {
+        [$petugas, , $peminjaman, $alat] = $this->createBorrowing();
+        $peminjaman->update(['status' => 'selesai']);
+        $pengembalian = Pengembalian::create([
+            'peminjaman_id' => $peminjaman->id,
+            'tgl_kembali' => now(),
+            'kondisi_kembali' => 'Baik',
+            'denda' => 0,
+            'petugas_id' => $petugas->id,
+        ]);
+        $admin = User::create([
+            'name' => 'Test Admin',
+            'email' => 'admin-return-edit@example.test',
+            'password' => 'password123',
+            'role' => 'admin',
+        ]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.pengembalian.update', $pengembalian), [
+                'kondisi_kembali' => 'Rusak Berat',
+                'denda' => 10000,
+            ])
+            ->assertRedirect(route('admin.pengembalian.index'));
+
+        $this->assertDatabaseHas('pengembalian', [
+            'id' => $pengembalian->id,
+            'kondisi_kembali' => 'Rusak Berat',
+            'denda' => 10000,
+        ]);
+        $this->assertDatabaseCount('pengembalian', 1);
+        $this->assertSame('selesai', $peminjaman->fresh()->status);
+        $this->assertSame(0, $alat->fresh()->stok);
     }
 
     private function createBorrowing(): array
@@ -79,6 +160,6 @@ class ReturnValidationFeedbackTest extends TestCase
             'jumlah' => 1,
         ]);
 
-        return [$petugas, $borrower, $peminjaman];
+        return [$petugas, $borrower, $peminjaman, $alat];
     }
 }

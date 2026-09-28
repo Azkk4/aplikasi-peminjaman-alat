@@ -53,8 +53,9 @@
 
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Gambar Alat (Opsional)</label>
-            <input type="file" name="gambar" accept="image/jpeg,image/png"
+            <input type="file" name="gambar" accept="image/jpeg,image/png" data-crop-input="gambar"
                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            <img data-crop-preview="gambar" alt="Pratinjau gambar alat" class="mt-3 hidden max-h-40 rounded-lg object-cover">
             @include('components.field-error', ['field' => 'gambar'])
         </div>
 

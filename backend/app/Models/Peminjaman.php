@@ -11,15 +11,29 @@ class Peminjaman extends Model
     protected $table = 'peminjaman'; 
  
     protected $fillable = [ 
-        'user_id', 'tgl_pinjam', 'tgl_kembali_plan', 'status' 
+        'user_id', 'tgl_pinjam', 'tgl_kembali_plan', 'status', 'pengembalian_diajukan_at' 
     ]; 
  
     protected function casts(): array { 
         return [ 
             'tgl_pinjam' => 'datetime', 
             'tgl_kembali_plan' => 'datetime', 
+            'pengembalian_diajukan_at' => 'datetime',
         ]; 
     } 
+
+    public function getDisplayStatusAttribute(): string
+    {
+        if ($this->status === 'dipinjam' && $this->pengembalian_diajukan_at) {
+            return 'menunggu_pengembalian';
+        }
+
+        if ($this->status === 'dipinjam' && $this->tgl_kembali_plan?->isPast()) {
+            return 'telat';
+        }
+
+        return $this->status;
+    }
  
     public function user(): BelongsTo { 
         return $this->belongsTo(User::class); 

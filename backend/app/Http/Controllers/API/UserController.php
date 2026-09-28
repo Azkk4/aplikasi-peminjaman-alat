@@ -30,6 +30,9 @@ class UserController extends Controller
     public function store(StoreUserRequest $request): JsonResponse 
     { 
         $data = $request->validated(); 
+        if ($data['role'] === 'admin' && ! $request->user()->isSuperAdmin()) {
+            return response()->json(['message' => 'Hanya Super Admin yang dapat menetapkan role Admin.'], 403);
+        }
         $user = DB::transaction(function () use ($request, $data) {
             $data['password'] = Hash::make($data['password']); 
  
@@ -53,6 +56,9 @@ class UserController extends Controller
     { 
         $validated = $request->validated();
         $actor = $request->user();
+        if ($user->isSuperAdmin() && ! $actor->isSuperAdmin()) {
+            return response()->json(['message' => 'Hanya Super Admin yang dapat mengubah data Super Admin.'], 403);
+        }
         if (($user->isSuperAdmin() || $user->id === $actor->id) && $validated['role'] !== $user->role) {
             return response()->json(['message' => 'Perubahan role tidak diizinkan.'], 403);
         }

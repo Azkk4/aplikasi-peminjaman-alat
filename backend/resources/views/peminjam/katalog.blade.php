@@ -14,9 +14,9 @@
  </form>
 <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
     @forelse($alats as $alat)
-        <article class="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <article class="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
             <img src="{{ $alat->image_url }}" alt="{{ $alat->nama_alat }}" class="h-40 w-full object-cover bg-gray-100">
-            <div class="p-5"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-medium text-emerald-600">{{ $alat->kategori->nama_kategori ?? 'Tanpa kategori' }}</p><h2 class="mt-1 text-lg font-bold text-gray-900">{{ $alat->nama_alat }}</h2></div><span class="whitespace-nowrap text-xs font-semibold text-emerald-700">{{ $alat->stok }} tersedia</span></div><div class="mt-4">@include('components.kondisi-badge', ['kondisi' => $alat->status_kondisi])</div><a href="{{ route('peminjam.katalog.show', $alat) }}" class="mt-5 block rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:border-emerald-600 hover:text-emerald-700">Lihat detail</a></div>
+            <div class="flex flex-1 flex-col p-5"><div class="flex items-start justify-between gap-3"><div class="min-w-0"><p class="text-xs font-medium text-emerald-600">{{ $alat->kategori->nama_kategori ?? 'Tanpa kategori' }}</p><h2 class="mt-1 break-words text-lg font-bold text-gray-900">{{ $alat->nama_alat }}</h2></div><span class="whitespace-nowrap text-xs font-semibold text-emerald-700">{{ $alat->stok }} tersedia</span></div><div class="mt-4">@include('components.kondisi-badge', ['kondisi' => $alat->status_kondisi])</div><a href="{{ route('peminjam.katalog.show', $alat) }}" class="mt-auto block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-center text-sm font-semibold text-gray-700 transition hover:border-emerald-600 hover:text-emerald-700">Lihat detail</a></div>
         </article>
     @empty
         <div class="col-span-full rounded-lg border border-gray-200 bg-white">@include('components.empty-state', ['title' => 'Alat tidak ditemukan', 'message' => 'Coba ubah kata kunci atau kategori pencarian.'])</div>

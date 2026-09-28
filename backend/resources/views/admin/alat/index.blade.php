@@ -62,7 +62,7 @@
                                 class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
                                 Edit
                             </a>
-                            <form action="{{ route('admin.alat.destroy', $alat->id) }}" method="POST" onsubmit="return confirm('Yakin ingin menghapus alat ini?')">
+                            <form action="{{ route('admin.alat.destroy', $alat->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus alat?" data-confirm-message="Data {{ $alat->nama_alat }} akan dihapus jika tidak digunakan dalam riwayat.">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">

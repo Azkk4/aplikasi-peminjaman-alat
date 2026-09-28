@@ -63,32 +63,12 @@
                         <span class="block font-semibold">Rencana: {{ $peminjaman->tgl_kembali_plan }}</span>
                     </td>
                     <td class="py-3 px-4 border-b">
-                        @include('components.status-badge', ['status' => $peminjaman->status])
+                        @include('components.status-badge', ['status' => $peminjaman->display_status])
                     </td>
                     <td class="py-3 px-4 border-b">
                         <div class="flex flex-col space-y-2">
-                            <!-- Form Ubah Status Cepat -->
-                            @if(!in_array($peminjaman->status, ['selesai', 'ditolak']))
-                            <form action="{{ route('admin.peminjaman.updateStatus', $peminjaman->id) }}" method="POST" class="flex items-center space-x-1">
-                                @csrf
-                                @method('PUT')
-                                <input type="hidden" name="_peminjaman_id" value="{{ $peminjaman->id }}">
-                                <select name="status" onchange="this.form.submit()" class="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none">
-                                    <option value="diajukan" {{ old('status', $peminjaman->status) == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
-                                    <option value="dipinjam" {{ old('status', $peminjaman->status) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
-                                    <option value="selesai" {{ old('status', $peminjaman->status) == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                    <option value="telat" {{ old('status', $peminjaman->status) == 'telat' ? 'selected' : '' }}>Telat</option>
-                                    <option value="ditolak" {{ old('status', $peminjaman->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
-                                </select>
-                            </form>
-                            @if((string) old('_peminjaman_id') === (string) $peminjaman->id)
-                                @include('components.field-error', ['field' => 'status'])
-                            @endif
-                            @endif
-
                             <!-- Tombol Hapus -->
-                            <form action="{{ route('admin.peminjaman.destroy', $peminjaman->id) }}" method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus data peminjaman ini?')">
+                            <form action="{{ route('admin.peminjaman.destroy', $peminjaman->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus peminjaman?" data-confirm-message="Peminjaman milik {{ $peminjaman->user->name ?? 'user yang dihapus' }} akan dihapus jika belum diproses.">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold transition w-full">

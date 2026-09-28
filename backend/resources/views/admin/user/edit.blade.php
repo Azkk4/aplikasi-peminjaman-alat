@@ -57,10 +57,10 @@
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Foto Profil</label>
             <div class="mb-2 flex items-center gap-3">
-                <img src="{{ $user->profile_photo_url }}" alt="Foto profil {{ $user->name }}" class="h-14 w-14 rounded-full object-cover">
+                <img src="{{ $user->profile_photo_url }}" data-crop-preview="foto_profile" alt="Foto profil {{ $user->name }}" class="h-14 w-14 rounded-full object-cover">
                 <span class="text-xs text-gray-500">Kosongkan jika tidak ingin mengganti foto.</span>
             </div>
-            <input type="file" name="foto_profile" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+            <input type="file" name="foto_profile" accept="image/jpeg,image/png,image/webp" data-crop-input="foto_profile" data-crop-aspect="square" class="w-full text-sm">
             @include('components.field-error', ['field' => 'foto_profile'])
         </div>
 

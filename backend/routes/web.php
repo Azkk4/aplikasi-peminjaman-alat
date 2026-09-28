@@ -57,11 +57,12 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::get('/peminjaman', [AdminController::class, 'indexPeminjaman'])->name('peminjaman.index');
         Route::get('/peminjaman/create', [AdminController::class, 'createPeminjaman'])->name('peminjaman.create');
         Route::post('/peminjaman', [AdminController::class, 'storePeminjaman'])->name('peminjaman.store');
-        Route::put('/peminjaman/{id}/status', [AdminController::class, 'updateStatusPeminjaman'])->name('peminjaman.updateStatus');
         Route::delete('/peminjaman/{id}', [AdminController::class, 'destroyPeminjaman'])->name('peminjaman.destroy');
 
         // Kelola Pengembalian (Monitoring & History Pengembalian Alat)
         Route::get('/pengembalian', [AdminController::class, 'indexPengembalian'])->name('pengembalian.index');
+        Route::get('/pengembalian/{pengembalian}/edit', [AdminController::class, 'editPengembalian'])->name('pengembalian.edit');
+        Route::put('/pengembalian/{pengembalian}', [AdminController::class, 'updatePengembalian'])->name('pengembalian.update');
     });
 
 
