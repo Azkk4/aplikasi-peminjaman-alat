@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Password;
 
 class AdminController extends Controller
 {
@@ -68,7 +69,7 @@ class AdminController extends Controller
             'nama_alat'      => 'required|string|max:255',
             'kategori_id'    => 'required|exists:kategori,id',
             'stok'           => 'required|integer|min:0',
-            'status_kondisi' => 'required|string|max:100',
+            'status_kondisi' => 'required|string|max:255',
             'deskripsi'      => 'nullable|string',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -105,7 +106,7 @@ class AdminController extends Controller
             'nama_alat'      => 'required|string|max:255',
             'kategori_id'    => 'required|exists:kategori,id',
             'stok'           => 'required|integer|min:0',
-            'status_kondisi' => 'required|string|max:100',
+            'status_kondisi' => 'required|string|max:255',
             'deskripsi'      => 'nullable|string',
             'gambar'         => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
@@ -181,9 +182,9 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
+            'password' => ['required', Password::min(8)->letters()->numbers()],
             'role' => ['required', Rule::in($allowedRoles)],
-            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'no_hp' => ['nullable', 'digits_between:11,13'],
             'alamat' => 'nullable|string|max:1000',
             'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
@@ -222,9 +223,6 @@ class AdminController extends Controller
         if ($user->isSuperAdmin() && ! $actor->isSuperAdmin()) {
             abort(403, 'Hanya Super Admin yang dapat mengubah Super Admin.');
         }
-        if ($user->id === $actor->id && $request->input('role') !== $user->role) {
-            abort(403, 'Anda tidak dapat mengubah role diri sendiri.');
-        }
         $allowedRoles = $actor->isSuperAdmin()
             ? ['admin', 'petugas', 'peminjam']
             : ['petugas', 'peminjam'];
@@ -233,10 +231,14 @@ class AdminController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $id,
             'role' => ['required', Rule::in($allowedRoles)],
-            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'no_hp' => ['nullable', 'digits_between:11,13'],
             'alamat' => 'nullable|string|max:1000',
             'foto_profile' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
         ]);
+
+        if ($user->id === $actor->id && $request->input('role') !== $user->role) {
+            abort(403, 'Anda tidak dapat mengubah role diri sendiri.');
+        }
 
         $data = [
             'name' => $request->name,
@@ -247,7 +249,7 @@ class AdminController extends Controller
         ];
 
         if ($request->filled('password')) {
-            $request->validate(['password' => 'string|min:8']);
+            $request->validate(['password' => ['string', Password::min(8)->letters()->numbers()]]);
             $data['password'] = Hash::make($request->password);
         }
 
@@ -389,10 +391,14 @@ class AdminController extends Controller
             'tgl_pinjam'       => 'required|date',
             'tgl_kembali_plan' => 'required|date|after_or_equal:tgl_pinjam',
             'alat_id'          => 'required|array',
-            'alat_id.*'        => 'distinct|exists:alat,id',
+            'alat_id.*'        => 'required|integer|distinct|exists:alat,id',
             'jumlah'           => 'required|array',
-            'jumlah.*'         => 'integer|min:1',
+            'jumlah.*'         => 'required|integer|min:1',
         ]);
+
+        if (count($request->alat_id) !== count($request->jumlah)) {
+            return back()->withErrors(['jumlah' => 'Jumlah untuk setiap alat wajib diisi.'])->withInput();
+        }
 
         DB::beginTransaction();
         try {

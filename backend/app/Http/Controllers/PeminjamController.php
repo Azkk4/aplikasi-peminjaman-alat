@@ -137,7 +137,7 @@ class PeminjamController extends Controller
     public function kembalikanPeminjaman(Request $request, Peminjaman $peminjaman)
     {
         $request->validate([
-            'kondisi_kembali' => ['required', 'string', 'max:100'],
+            'kondisi_kembali' => ['required', 'string', 'max:255'],
         ]);
 
         try {
@@ -184,7 +184,7 @@ class PeminjamController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'no_hp' => ['nullable', 'digits_between:11,13'],
             'alamat' => ['nullable', 'string', 'max:1000'],
             'foto_profile' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);

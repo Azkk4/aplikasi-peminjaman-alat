@@ -81,7 +81,7 @@ class PetugasController extends Controller
     public function prosesPengembalian(Request $request, $peminjamanId)
     {
         $request->validate([
-            'kondisi_kembali' => 'required|string|max:100',
+            'kondisi_kembali' => 'required|string|max:255',
             'denda' => 'nullable|integer|min:0',
         ]);
 

@@ -13,6 +13,7 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Nama Alat</label>
             <input type="text" name="nama_alat" value="{{ old('nama_alat', $alat->nama_alat) }}" required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @include('components.field-error', ['field' => 'nama_alat'])
         </div>
 
         <div class="mb-4">
@@ -24,6 +25,7 @@
                     </option>
                 @endforeach
             </select>
+            @include('components.field-error', ['field' => 'kategori_id'])
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -31,12 +33,14 @@
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Stok</label>
                 <input type="number" name="stok" value="{{ old('stok', $alat->stok) }}" min="0" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @include('components.field-error', ['field' => 'stok'])
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Status Kondisi</label>
                 <input type="text" name="status_kondisi" value="{{ old('status_kondisi', $alat->status_kondisi) }}" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @include('components.field-error', ['field' => 'status_kondisi'])
             </div>
         </div>
 
@@ -44,6 +48,7 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Deskripsi</label>
             <textarea name="deskripsi" rows="3"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('deskripsi', $alat->deskripsi) }}</textarea>
+            @include('components.field-error', ['field' => 'deskripsi'])
         </div>
 
         <div class="mb-6">
@@ -53,8 +58,9 @@
                 <img src="{{ $alat->image_url }}" alt="Preview" class="w-16 h-16 object-cover rounded-lg border"
                      onerror="this.onerror=null;this.src='{{ asset('images/no-image.svg') }}';">
             </div>
-            <input type="file" name="gambar" accept="image/*"
+            <input type="file" name="gambar" accept="image/jpeg,image/png"
                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+            @include('components.field-error', ['field' => 'gambar'])
         </div>
 
         <div class="flex justify-end space-x-2">

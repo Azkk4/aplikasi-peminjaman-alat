@@ -13,7 +13,7 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Nama Kategori</label>
             <input type="text" name="nama_kategori" value="{{ old('nama_kategori', $kategori->nama_kategori) }}" required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            @error('nama_kategori') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @include('components.field-error', ['field' => 'nama_kategori'])
         </div>
 
         <div class="flex justify-end space-x-2">

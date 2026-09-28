@@ -12,24 +12,27 @@
         <form action="{{ route('petugas.laporan.index') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Tanggal Mulai</label>
-                <input type="date" name="tgl_mulai" value="{{ request('tgl_mulai') }}"
+                <input type="date" name="tgl_mulai" value="{{ old('tgl_mulai', request('tgl_mulai')) }}"
                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                @include('components.field-error', ['field' => 'tgl_mulai'])
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Tanggal Selesai</label>
-                <input type="date" name="tgl_selesai" value="{{ request('tgl_selesai') }}"
+                <input type="date" name="tgl_selesai" value="{{ old('tgl_selesai', request('tgl_selesai')) }}"
                     class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                @include('components.field-error', ['field' => 'tgl_selesai'])
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Status Transaksi</label>
                 <select name="status" class="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
                     <option value="">Semua Status</option>
-                    <option value="dipinjam" {{ request('status') == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
-                    <option value="selesai" {{ request('status') == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                    <option value="telat" {{ request('status') == 'telat' ? 'selected' : '' }}>Telat</option>
+                    <option value="dipinjam" {{ old('status', request('status')) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
+                    <option value="selesai" {{ old('status', request('status')) == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                    <option value="telat" {{ old('status', request('status')) == 'telat' ? 'selected' : '' }}>Telat</option>
                 </select>
+                @include('components.field-error', ['field' => 'status'])
             </div>
 
             <div class="flex space-x-2">

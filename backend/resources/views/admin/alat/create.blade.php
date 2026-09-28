@@ -12,7 +12,7 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Nama Alat</label>
             <input type="text" name="nama_alat" value="{{ old('nama_alat') }}" required placeholder="Contoh: Multimeter Digital"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            @error('nama_alat') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @include('components.field-error', ['field' => 'nama_alat'])
         </div>
 
         <div class="mb-4">
@@ -25,7 +25,7 @@
                     </option>
                 @endforeach
             </select>
-            @error('kategori_id') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @include('components.field-error', ['field' => 'kategori_id'])
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -33,14 +33,14 @@
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Stok</label>
                 <input type="number" name="stok" value="{{ old('stok', 1) }}" min="0" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                @error('stok') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                @include('components.field-error', ['field' => 'stok'])
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Status Kondisi</label>
                 <input type="text" name="status_kondisi" value="{{ old('status_kondisi', 'Baik') }}" required placeholder="Contoh: Baik / Rusak Ringan"
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                @error('status_kondisi') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                @include('components.field-error', ['field' => 'status_kondisi'])
             </div>
         </div>
 
@@ -48,14 +48,14 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Deskripsi (Opsional)</label>
             <textarea name="deskripsi" rows="3" placeholder="Keterangan tambahan tentang alat..."
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">{{ old('deskripsi') }}</textarea>
-            @error('deskripsi') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @include('components.field-error', ['field' => 'deskripsi'])
         </div>
 
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Gambar Alat (Opsional)</label>
-            <input type="file" name="gambar" accept="image/*"
+            <input type="file" name="gambar" accept="image/jpeg,image/png"
                 class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
-            @error('gambar') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+            @include('components.field-error', ['field' => 'gambar'])
         </div>
 
         <div class="flex justify-end space-x-2">

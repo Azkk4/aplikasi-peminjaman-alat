@@ -51,14 +51,15 @@ class UserController extends Controller
     } 
     public function update(UpdateUserRequest $request, User $user): JsonResponse 
     { 
+        $validated = $request->validated();
         $actor = $request->user();
-        if (($user->isSuperAdmin() || $user->id === $actor->id) && $request->input('role') !== $user->role) {
+        if (($user->isSuperAdmin() || $user->id === $actor->id) && $validated['role'] !== $user->role) {
             return response()->json(['message' => 'Perubahan role tidak diizinkan.'], 403);
         }
-        if ($request->input('role') === 'admin' && ! $actor->isSuperAdmin()) {
+        if ($validated['role'] === 'admin' && ! $actor->isSuperAdmin()) {
             return response()->json(['message' => 'Hanya Super Admin yang dapat menetapkan role Admin.'], 403);
         }
-        $data = collect($request->validated()); 
+        $data = collect($validated);
         DB::transaction(function () use ($request, $data, $user) { 
             if ($data->get('password')) { 
                 $data['password'] = Hash::make($data['password']); 

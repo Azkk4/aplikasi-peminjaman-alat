@@ -4,12 +4,6 @@
 @section('header-title', 'Manajemen Data Alat')
 
 @section('content')
-@if(session('success'))
-<div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-lg shadow-sm text-sm">
-    {{ session('success') }}
-</div>
-@endif
-
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
     <div class="p-5 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
         <h3 class="text-lg font-bold text-gray-800">Daftar Alat Laboratorium</h3>

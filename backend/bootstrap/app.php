@@ -16,6 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up', 
     ) 
     ->withMiddleware(function (Middleware $middleware) {
+        $middleware->trimStrings(except: ['no_hp']);
         $middleware->alias([ 
             'role.admin' => IsAdmin::class, 
             'role.petugas' => IsPetugas::class, 

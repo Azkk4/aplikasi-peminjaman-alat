@@ -28,9 +28,9 @@ class StoreUserRequest extends FormRequest
             'role' => ['required', 
                 Rule::in(['admin', 'petugas', 'peminjam']) // input hanya boleh dari opsi ini 
             ], 
-            'no_hp' => ['nullable', 'string', 'regex:/^[0-9+() .-]{8,20}$/'],
+            'no_hp' => ['nullable', 'digits_between:11,13'],
             'alamat' => ['nullable', 'string', 'max:1000'],
-            'foto_profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg', 'max:2048'], 
+            'foto_profile' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ]; 
     } 
 }

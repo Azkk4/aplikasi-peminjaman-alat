@@ -18,7 +18,7 @@ class RegisterRequest extends FormRequest
             'name' => 'required|string|max:255', 
             'email' => 'required|string|email|max:255|unique:users', 
             'password' => 'required|string|min:8|confirmed', 
-            'no_hp' => 'nullable|string|max:15', 
+            'no_hp' => ['nullable', 'digits_between:11,13'],
             'alamat' => 'nullable|string', 
         ]; 
     } 

@@ -17,18 +17,6 @@
         </h1>
     </div>
 
-    @if(session('success'))
-        <div class="mb-5 rounded-lg border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if($errors->any())
-        <div class="mb-5 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-            {{ $errors->first() }}
-        </div>
-    @endif
-
     <form
         action="{{ route('peminjam.profil.update') }}"
         method="POST"
@@ -44,6 +32,7 @@
             <div class="flex-1">
                 <label for="foto_profile" class="block text-sm font-semibold text-gray-700">Foto profil</label>
                 <input id="foto_profile" name="foto_profile" type="file" accept="image/jpeg,image/png,image/webp" class="mt-2 block w-full text-sm text-gray-600">
+                @include('components.field-error', ['field' => 'foto_profile'])
             </div>
         </div>
 
@@ -63,6 +52,7 @@
                 required
                 class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
             >
+            @include('components.field-error', ['field' => 'name'])
         </div>
 
         <div class="mb-6">
@@ -81,16 +71,19 @@
                 required
                 class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:border-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-200"
             >
+            @include('components.field-error', ['field' => 'email'])
         </div>
 
         <div class="mb-5">
             <label for="no_hp" class="block text-sm font-semibold text-gray-700">Nomor HP</label>
-            <input id="no_hp" name="no_hp" type="tel" maxlength="20" value="{{ old('no_hp', auth()->user()->no_hp) }}" class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm">
+            <input id="no_hp" name="no_hp" type="text" inputmode="numeric" value="{{ old('no_hp', auth()->user()->no_hp) }}" class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm">
+            @include('components.field-error', ['field' => 'no_hp'])
         </div>
 
         <div class="mb-6">
             <label for="alamat" class="block text-sm font-semibold text-gray-700">Alamat</label>
             <textarea id="alamat" name="alamat" rows="3" maxlength="1000" class="mt-2 w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm">{{ old('alamat', auth()->user()->alamat) }}</textarea>
+            @include('components.field-error', ['field' => 'alamat'])
         </div>
 
         <div class="flex justify-end">

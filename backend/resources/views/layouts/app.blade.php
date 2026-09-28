@@ -82,7 +82,6 @@
                     <a href="{{ route('peminjam.katalog.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.katalog.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Katalog Alat</a>
                     <a href="{{ route('peminjam.peminjaman.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.peminjaman.*') && request('from') !== 'riwayat' ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Peminjaman Saya</a>
                     <a href="{{ route('peminjam.riwayat') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.riwayat') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Riwayat Peminjaman</a>
-                    <a href="{{ route('peminjam.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.profil*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @endif
             </nav>
 
@@ -110,14 +109,14 @@
 
                 <div class="flex items-center gap-3">
                     @if(auth()->user()->role === 'peminjam')
-                        <a href="{{ route('peminjam.profil') }}" class="text-sm font-semibold text-gray-700 hover:text-emerald-600">Profil</a>
+                        <a href="{{ route('peminjam.profil') }}" class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600">Profil</a>
                     @endif
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
                         <button
                             type="submit"
                             onclick="return confirm('Yakin ingin keluar dari aplikasi?')"
-                            class="bg-red-500 hover:bg-red-600 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+                            class="inline-flex items-center rounded-lg bg-red-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-red-600">
                             Logout
                         </button>
                     </form>
@@ -141,7 +140,6 @@
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.katalog.index') }}">Katalog Alat</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.peminjaman.index') }}">Peminjaman Saya</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.riwayat') }}">Riwayat Peminjaman</a>
-                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.profil') }}">Profil</a>
                     @endif
                 </nav>
             </div>

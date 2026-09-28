@@ -4,18 +4,6 @@
 @section('header-title', 'Manajemen Transaksi Peminjaman')
 
 @section('content')
-@if(session('success'))
-<div class="mb-4 bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-lg shadow-sm text-sm">
-    {{ session('success') }}
-</div>
-@endif
-
-@if(session('error'))
-<div class="mb-4 bg-red-50 border border-red-200 text-red-800 p-4 rounded-lg shadow-sm text-sm">
-    {{ session('error') }}
-</div>
-@endif
-
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
     <div class="p-5 border-b border-gray-200 bg-gray-50 flex flex-col md:flex-row justify-between items-center gap-4">
         <h3 class="text-lg font-bold text-gray-800">Daftar Transaksi Peminjaman</h3>
@@ -84,14 +72,18 @@
                             <form action="{{ route('admin.peminjaman.updateStatus', $peminjaman->id) }}" method="POST" class="flex items-center space-x-1">
                                 @csrf
                                 @method('PUT')
+                                <input type="hidden" name="_peminjaman_id" value="{{ $peminjaman->id }}">
                                 <select name="status" onchange="this.form.submit()" class="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none">
-                                    <option value="diajukan" {{ $peminjaman->status == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
-                                    <option value="dipinjam" {{ $peminjaman->status == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
-                                    <option value="selesai" {{ $peminjaman->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
-                                    <option value="telat" {{ $peminjaman->status == 'telat' ? 'selected' : '' }}>Telat</option>
-                                    <option value="ditolak" {{ $peminjaman->status == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
+                                    <option value="diajukan" {{ old('status', $peminjaman->status) == 'diajukan' ? 'selected' : '' }}>Diajukan</option>
+                                    <option value="dipinjam" {{ old('status', $peminjaman->status) == 'dipinjam' ? 'selected' : '' }}>Dipinjam</option>
+                                    <option value="selesai" {{ old('status', $peminjaman->status) == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                    <option value="telat" {{ old('status', $peminjaman->status) == 'telat' ? 'selected' : '' }}>Telat</option>
+                                    <option value="ditolak" {{ old('status', $peminjaman->status) == 'ditolak' ? 'selected' : '' }}>Ditolak</option>
                                 </select>
                             </form>
+                            @if((string) old('_peminjaman_id') === (string) $peminjaman->id)
+                                @include('components.field-error', ['field' => 'status'])
+                            @endif
                             @endif
 
                             <!-- Tombol Hapus -->

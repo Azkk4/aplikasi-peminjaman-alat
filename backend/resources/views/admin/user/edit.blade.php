@@ -13,12 +13,14 @@
             <label class="block text-gray-700 text-sm font-semibold mb-2">Nama Lengkap</label>
             <input type="text" name="name" value="{{ old('name', $user->name) }}" required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @include('components.field-error', ['field' => 'name'])
         </div>
 
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Email</label>
             <input type="email" name="email" value="{{ old('email', $user->email) }}" required
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @include('components.field-error', ['field' => 'email'])
         </div>
 
         <div class="mb-4">
@@ -26,26 +28,30 @@
                 <span class="text-xs text-gray-400 font-normal">(Kosongkan jika tidak ingin mengubah password)</span></label>
             <input type="password" name="password"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @include('components.field-error', ['field' => 'password'])
         </div>
 
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Role / Hak Akses</label>
             <select name="role" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <option value="peminjam" {{ $user->role == 'peminjam' ? 'selected' : '' }}>Peminjam</option>
-                <option value="petugas" {{ $user->role == 'petugas' ? 'selected' : '' }}>Petugas</option>
-                <option value="admin" {{ $user->role == 'admin' ? 'selected' : '' }}>Admin</option>
+                <option value="peminjam" {{ old('role', $user->role) == 'peminjam' ? 'selected' : '' }}>Peminjam</option>
+                <option value="petugas" {{ old('role', $user->role) == 'petugas' ? 'selected' : '' }}>Petugas</option>
+                <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Admin</option>
             </select>
+            @include('components.field-error', ['field' => 'role'])
         </div>
 
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">No. HP</label>
-            <input type="tel" name="no_hp" maxlength="20" value="{{ old('no_hp', $user->no_hp) }}"
+            <input type="text" name="no_hp" inputmode="numeric" value="{{ old('no_hp', $user->no_hp) }}"
                 class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            @include('components.field-error', ['field' => 'no_hp'])
         </div>
 
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Alamat</label>
             <textarea name="alamat" maxlength="1000" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg">{{ old('alamat', $user->alamat) }}</textarea>
+            @include('components.field-error', ['field' => 'alamat'])
         </div>
 
         <div class="mb-6">
@@ -55,6 +61,7 @@
                 <span class="text-xs text-gray-500">Kosongkan jika tidak ingin mengganti foto.</span>
             </div>
             <input type="file" name="foto_profile" accept="image/jpeg,image/png,image/webp" class="w-full text-sm">
+            @include('components.field-error', ['field' => 'foto_profile'])
         </div>
 
         <div class="flex justify-end space-x-2">

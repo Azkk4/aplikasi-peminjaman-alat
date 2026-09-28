@@ -21,17 +21,6 @@
             </div>
         @endif
 
-        <!-- Alert Error Validasi -->
-        @if($errors->any())
-            <div class="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
-                <ul class="list-disc pl-5 mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
         <form action="{{ route('login') }}" method="POST">
             @csrf
 
@@ -43,6 +32,7 @@
                        value="{{ old('email') }}"
                        required
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  @include('components.field-error', ['field' => 'email'])
             </div>
 
             <!-- Input Password -->
@@ -52,6 +42,7 @@
                        name="password"
                        required
                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                  @include('components.field-error', ['field' => 'password'])
             </div>
 
             <!-- Tombol Submit -->

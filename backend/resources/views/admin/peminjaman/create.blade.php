@@ -5,12 +5,6 @@
 
 @section('content')
 <div class="max-w-2xl bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-    @if(session('error'))
-    <div class="mb-4 bg-red-50 border border-red-200 text-red-800 p-3 rounded-lg text-sm">
-        {{ session('error') }}
-    </div>
-    @endif
-
     <form action="{{ route('admin.peminjaman.store') }}" method="POST">
         @csrf
 
@@ -24,6 +18,7 @@
                     </option>
                 @endforeach
             </select>
+            @include('components.field-error', ['field' => 'user_id'])
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -31,12 +26,14 @@
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Tanggal Pinjam</label>
                 <input type="date" name="tgl_pinjam" value="{{ old('tgl_pinjam', date('Y-m-d')) }}" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @include('components.field-error', ['field' => 'tgl_pinjam'])
             </div>
 
             <div>
                 <label class="block text-gray-700 text-sm font-semibold mb-2">Rencana Tanggal Kembali</label>
                 <input type="date" name="tgl_kembali_plan" value="{{ old('tgl_kembali_plan', date('Y-m-d', strtotime('+3 days'))) }}" required
                     class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @include('components.field-error', ['field' => 'tgl_kembali_plan'])
             </div>
         </div>
 
@@ -44,18 +41,31 @@
         <div class="mb-6">
             <label class="block text-gray-700 text-sm font-semibold mb-2">Daftar Alat yang Dipinjam</label>
             <div id="alat-container" class="space-y-2">
-                <div class="flex items-center gap-2 alat-row">
-                    <select name="alat_id[]" required class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none">
-                        <option value="">-- Pilih Alat --</option>
-                        @foreach($alats as $alat)
-                            <option value="{{ $alat->id }}">{{ $alat->nama_alat }} (Stok: {{ $alat->stok }})</option>
-                        @endforeach
-                    </select>
-                    <input type="number" name="jumlah[]" value="1" min="1" placeholder="Jumlah" required
-                        class="w-24 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none">
-                    <button type="button" onclick="removeRow(this)" class="bg-red-500 text-white px-3 py-2 rounded-lg text-xs hover:bg-red-600 transition">X</button>
-                </div>
+                @php
+                    $oldAlatIds = old('alat_id', [null]);
+                    $oldJumlah = old('jumlah', [1]);
+                    $oldAlatIds = is_array($oldAlatIds) && $oldAlatIds !== [] ? $oldAlatIds : [null];
+                    $oldJumlah = is_array($oldJumlah) ? $oldJumlah : [];
+                @endphp
+                @foreach($oldAlatIds as $index => $oldAlatId)
+                    <div class="alat-row">
+                        <div class="flex items-center gap-2">
+                            <select name="alat_id[]" required class="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none">
+                                <option value="">-- Pilih Alat --</option>
+                                @foreach($alats as $alat)
+                                    <option value="{{ $alat->id }}" {{ (string) $oldAlatId === (string) $alat->id ? 'selected' : '' }}>{{ $alat->nama_alat }} (Stok: {{ $alat->stok }})</option>
+                                @endforeach
+                            </select>
+                            <input type="number" name="jumlah[]" value="{{ $oldJumlah[$index] ?? '' }}" min="1" placeholder="Jumlah" required class="w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none">
+                            <button type="button" onclick="removeRow(this)" class="rounded-lg bg-red-500 px-3 py-2 text-xs text-white transition hover:bg-red-600">X</button>
+                        </div>
+                        @include('components.field-error', ['field' => "alat_id.{$index}"])
+                        @include('components.field-error', ['field' => "jumlah.{$index}"])
+                    </div>
+                @endforeach
             </div>
+            @include('components.field-error', ['field' => 'alat_id'])
+            @include('components.field-error', ['field' => 'jumlah'])
 
             <button type="button" onclick="addRow()" class="mt-3 bg-gray-800 hover:bg-gray-900 text-white text-xs font-semibold px-3 py-2 rounded-lg transition">
                 + Tambah Alat Lain
