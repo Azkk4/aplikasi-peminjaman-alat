@@ -24,6 +24,8 @@ Route::middleware(['auth', 'active.user'])->get('/dashboard', function () {
 // ==========
 Route::middleware(['auth', 'active.user', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
+        Route::get('/profil', [PeminjamController::class, 'profil'])->name('profil');
+        Route::put('/profil', [PeminjamController::class, 'updateProfil'])->name('profil.update');
 
         // CRUD Alat
         Route::get('/alat', [AdminController::class, 'indexAlat'])->name('alat.index');
@@ -83,6 +85,8 @@ Route::middleware(['auth', 'active.user', 'role:petugas,admin'])->prefix('petuga
 
     // Cetak Laporan (Tambahkan method ini atau arahkan sementara)
     Route::get('/laporan', [PetugasController::class, 'indexLaporan'])->name('laporan.index');
+    Route::get('/profil', [PeminjamController::class, 'profil'])->name('profil');
+    Route::put('/profil', [PeminjamController::class, 'updateProfil'])->name('profil.update');
 });
 
 // ==========

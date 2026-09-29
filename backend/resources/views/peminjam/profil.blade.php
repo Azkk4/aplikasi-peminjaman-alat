@@ -9,7 +9,7 @@
 
     <div class="mb-6">
         <p class="text-sm font-medium text-emerald-600">
-            Akun peminjam
+            Akun {{ auth()->user()->isSuperAdmin() ? 'Super Admin' : ucfirst(auth()->user()->role) }}
         </p>
 
         <h1 class="mt-1 text-2xl font-bold text-gray-900">
@@ -18,7 +18,7 @@
     </div>
 
     <form
-        action="{{ route('peminjam.profil.update') }}"
+        action="{{ route(auth()->user()->role . '.profil.update') }}"
         method="POST"
         enctype="multipart/form-data"
         class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm"

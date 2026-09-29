@@ -11,12 +11,12 @@
     @stack('head')
 </head>
 
-<body class="bg-gray-100 font-sans antialiased @yield('body-class')">
+<body class="min-h-screen overflow-x-hidden bg-gray-100 font-sans antialiased @yield('body-class')">
 
-    <div id="app-shell" class="flex min-h-screen overflow-hidden">
+    <div id="app-shell" class="min-h-screen">
 
         <!-- SIDEBAR -->
-        <aside class="w-64 bg-gray-900 text-white flex-col hidden md:flex print-hidden">
+        <aside class="fixed inset-y-0 left-0 z-30 hidden h-screen w-56 flex-col overflow-y-auto overscroll-contain bg-gray-900 text-white print-hidden md:flex lg:w-64">
             @if(auth()->user()->role === 'admin')
                 <div class="p-5 text-xl font-bold tracking-wider border-b border-gray-800">
                     PANEL ADMIN
@@ -63,6 +63,8 @@
                        class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.pengembalian.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                         Kelola Pengembalian
                     </a>
+
+                    <a href="{{ route('admin.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.profil') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @elseif(auth()->user()->role === 'petugas')
                     <!-- MENU KHUSUS PETUGAS -->
                     <a href="{{ route('petugas.peminjaman.index') }}"
@@ -79,6 +81,8 @@
                        class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('petugas.laporan.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">
                         Cetak Laporan
                     </a>
+
+                    <a href="{{ route('petugas.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('petugas.profil') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @elseif(auth()->user()->role === 'peminjam')
                     <a href="{{ route('peminjam.dashboard') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.dashboard') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Dashboard</a>
                     <a href="{{ route('peminjam.katalog.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.katalog.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Katalog Alat</a>
@@ -97,26 +101,24 @@
         </aside>
 
         <!-- MAIN CONTENT CONTAINER -->
-        <div id="app-content" class="flex-1 flex flex-col overflow-y-auto">
+        <div id="app-content" class="min-h-screen min-w-0 md:ml-56 lg:ml-64">
 
             <!-- NAVBAR ATAS -->
-            <header class="bg-white shadow-sm min-h-16 flex items-center justify-between px-4 sm:px-6 py-4 z-10 print-hidden">
-                <div class="flex items-center gap-3">
+            <header class="fixed inset-x-0 top-0 z-40 flex h-16 items-center justify-between bg-white px-3 shadow-sm print-hidden sm:px-6 md:left-56 lg:left-64">
+                <div class="flex min-w-0 items-center gap-2 sm:gap-3">
                     @if(auth()->user()->role === 'admin')
                         <span class="hidden text-xs font-semibold text-gray-500 sm:inline">{{ auth()->user()->isSuperAdmin() ? 'Super Admin' : 'Admin' }}</span>
                     @endif
                     <button type="button" id="mobile-menu-toggle" aria-controls="mobile-menu" aria-expanded="false" class="md:hidden rounded-lg border border-gray-300 px-3 py-2 text-gray-700" aria-label="Buka menu">
                         &#9776;
                     </button>
-                    <div class="text-lg font-semibold text-gray-800">
+                    <div class="min-w-0 truncate text-sm font-semibold text-gray-800 sm:text-lg">
                     @yield('header-title', 'Dashboard')
                     </div>
                 </div>
 
-                <div class="flex items-center gap-3">
-                    @if(auth()->user()->role === 'peminjam')
-                        <a href="{{ route('peminjam.profil') }}" class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600">Profil</a>
-                    @endif
+                <div class="ml-2 flex shrink-0 items-center gap-2 sm:gap-3">
+                    <a href="{{ route(auth()->user()->role . '.profil') }}" class="inline-flex items-center rounded-lg border border-gray-300 bg-white px-2.5 py-2 text-xs font-semibold text-gray-700 transition hover:border-emerald-500 hover:text-emerald-600 sm:px-3 sm:text-sm">Profil</a>
                     <form action="{{ route('logout') }}" method="POST" data-confirm="true" data-confirm-title="Keluar dari aplikasi?" data-confirm-message="Apakah Anda yakin ingin keluar?" data-confirm-accept="Logout">
                         @csrf
                         <button
@@ -128,7 +130,8 @@
                 </div>
             </header>
 
-            <div id="mobile-menu" class="hidden border-b border-gray-200 bg-gray-900 p-4 text-white md:hidden print-hidden">
+            <div id="app-main-region" class="min-h-screen pt-16">
+            <div id="mobile-menu" class="fixed inset-x-0 top-16 z-30 hidden border-b border-gray-200 bg-gray-900 p-4 text-white md:hidden print-hidden">
                 <nav class="space-y-2">
                     @if(auth()->user()->role === 'admin')
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.dashboard') }}">Dashboard</a>
@@ -137,10 +140,12 @@
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.alat.index') }}">Kelola Alat</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.peminjaman.index') }}">Kelola Peminjaman</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.pengembalian.index') }}">Kelola Pengembalian</a>
+                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.profil') }}">Profil</a>
                     @elseif(auth()->user()->role === 'petugas')
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.peminjaman.index') }}">Persetujuan Peminjaman</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.pengembalian.index') }}">Pemantauan Pengembalian</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.laporan.index') }}">Cetak Laporan</a>
+                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.profil') }}">Profil</a>
                     @else
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.dashboard') }}">Dashboard</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.katalog.index') }}">Katalog Alat</a>
@@ -172,6 +177,7 @@
                 </div>
                 @yield('content')
             </main>
+            </div>
 
         </div>
     </div>

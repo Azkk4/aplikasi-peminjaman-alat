@@ -55,6 +55,10 @@ class ReportPrintViewTest extends TestCase
             ]))
             ->assertOk()
             ->assertSee('Laporan Transaksi Peminjaman')
+            ->assertSee('Filter Laporan')
+            ->assertSee('Status Peminjaman')
+            ->assertSee('Hasil Rekap Laporan')
+            ->assertSee('Cetak / Print Laporan')
             ->assertSee('10/09/2026 09:30')
             ->assertSee('15/09/2026')
             ->assertSee('Fajar Oktavian')
@@ -64,6 +68,8 @@ class ReportPrintViewTest extends TestCase
             ->assertSee('id="mobile-menu"', false)
             ->assertSee('Logout')
             ->assertSee('size: A4 landscape')
-            ->assertSee('report-actions, .report-filters', false);
+            ->assertSee('.print-report-document { display: none;', false)
+            ->assertSee('body.report-page .report-screen { display: none !important; }', false)
+            ->assertSee('body.report-page .print-report-document { display: block !important; }', false);
     }
 }
