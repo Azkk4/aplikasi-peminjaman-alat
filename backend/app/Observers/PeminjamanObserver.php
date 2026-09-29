@@ -28,7 +28,13 @@ class PeminjamanObserver
     { 
         $namaPeminjam = $peminjaman->user?->name ?? 'User tidak tersedia';
         if ($peminjaman->wasChanged('status')) { 
-            $this->catatLog("Status peminjaman milik {$namaPeminjam} berubah menjadi: '{$peminjaman->status}'");
+            $aktivitas = match ($peminjaman->status) {
+                'dipinjam' => "Menyetujui permohonan peminjaman milik {$namaPeminjam}.",
+                'ditolak' => "Menolak permohonan peminjaman milik {$namaPeminjam}.",
+                'selesai' => "Menyelesaikan pengembalian peminjaman milik {$namaPeminjam}.",
+                default => "Status peminjaman milik {$namaPeminjam} berubah menjadi '{$peminjaman->status}'.",
+            };
+            $this->catatLog($aktivitas);
         } else { 
             if (!empty($peminjaman->getChanges())) { 
                 $this->catatLog("Memperbarui detail peminjaman milik {$namaPeminjam}");

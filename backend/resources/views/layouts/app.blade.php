@@ -135,6 +135,7 @@
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.kategori.index') }}">Kelola Kategori</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.alat.index') }}">Kelola Alat</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.peminjaman.index') }}">Kelola Peminjaman</a>
+                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.pengembalian.index') }}">Kelola Pengembalian</a>
                     @elseif(auth()->user()->role === 'petugas')
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.peminjaman.index') }}">Persetujuan Peminjaman</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.pengembalian.index') }}">Pemantauan Pengembalian</a>

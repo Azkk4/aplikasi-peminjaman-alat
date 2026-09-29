@@ -44,6 +44,10 @@ class SuperAdminAuthorizationTest extends TestCase
             ])
             ->assertForbidden();
 
+        $this->actingAs($admin)
+            ->get(route('admin.user.edit', $superAdmin))
+            ->assertForbidden();
+
         $this->assertDatabaseHas('users', [
             'id' => $superAdmin->id,
             'name' => 'Protected Admin',

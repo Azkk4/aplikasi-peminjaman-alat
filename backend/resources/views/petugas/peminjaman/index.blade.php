@@ -32,6 +32,7 @@
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tanggal Pinjam</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Rencana Kembali</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Detail Alat</th>
+                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
                     <th class="py-4 px-5 text-center text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
@@ -53,9 +54,10 @@
                                 @endforeach
                             </ul>
                         </td>
+                        <td class="py-3 px-4 border-b">@include('components.status-badge', ['status' => $item->display_status])</td>
                         <td class="py-3 px-4 border-b">
-                            @if($item->status == 'diajukan')
-                                <div class="flex flex-row gap-2 justify-center">
+                            @if($item->status === 'diajukan')
+                                <div class="flex flex-col gap-2 sm:flex-row sm:justify-center">
                                     <!-- Tombol Setujui -->
                                     <form action="{{ route('petugas.peminjaman.setujui', $item->id) }}" method="POST" data-confirm="true" data-confirm-title="Setujui peminjaman?" data-confirm-message="Peminjam: {{ $item->user->name ?? 'User dihapus' }}. Stok akan dikurangi saat disetujui." data-confirm-accept="Setujui">
                                         @csrf
@@ -80,21 +82,12 @@
                                         </button>
                                     </form>
                                 </div>
-                            @else
-                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-700 rounded-full">
-                                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-                                    </svg>
-                                    {{ ucfirst($item->status) }}
-                                </span>
-                                    {{ ucfirst($item->status) }}
-                                </span>
                             @endif
                         </td>
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" class="py-6 text-center text-gray-500">
+                        <td colspan="6" class="py-6 text-center text-gray-500">
                             Tidak ada pengajuan peminjaman baru.
                         </td>
                     </tr>

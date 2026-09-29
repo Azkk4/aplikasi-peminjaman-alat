@@ -58,6 +58,44 @@ class ReturnValidationFeedbackTest extends TestCase
         $this->assertSame(0, $alat->fresh()->stok);
     }
 
+    public function test_only_the_borrower_can_request_their_own_return(): void
+    {
+        [$petugas, , $peminjaman, $alat] = $this->createBorrowing();
+        $otherBorrower = User::create([
+            'name' => 'Other Borrower',
+            'email' => 'other-borrower-return@example.test',
+            'password' => 'password123',
+            'role' => 'peminjam',
+        ]);
+
+        $this->actingAs($otherBorrower)
+            ->post(route('peminjam.peminjaman.return', $peminjaman))
+            ->assertForbidden();
+
+        $this->assertNull($peminjaman->fresh()->pengembalian_diajukan_at);
+        $this->assertDatabaseMissing('pengembalian', ['peminjaman_id' => $peminjaman->id]);
+        $this->assertSame(0, $alat->fresh()->stok);
+    }
+
+    public function test_staff_cannot_accept_a_return_with_an_unknown_condition(): void
+    {
+        [$petugas, , $peminjaman, $alat] = $this->createBorrowing();
+        $peminjaman->update(['pengembalian_diajukan_at' => now()]);
+
+        $this->actingAs($petugas)
+            ->from(route('petugas.pengembalian.index'))
+            ->post(route('petugas.pengembalian.proses', $peminjaman), [
+                'kondisi_kembali' => 'Perlu Diperiksa',
+                'denda' => '0',
+            ])
+            ->assertRedirect(route('petugas.pengembalian.index'))
+            ->assertSessionHasErrors('kondisi_kembali');
+
+        $this->assertDatabaseMissing('pengembalian', ['peminjaman_id' => $peminjaman->id]);
+        $this->assertDatabaseHas('peminjaman', ['id' => $peminjaman->id, 'status' => 'dipinjam']);
+        $this->assertSame(0, $alat->fresh()->stok);
+    }
+
     public function test_staff_acceptance_finalizes_return_and_restores_stock_only_once(): void
     {
         [$petugas, , $peminjaman, $alat] = $this->createBorrowing();

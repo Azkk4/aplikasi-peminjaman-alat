@@ -31,14 +31,27 @@ class PengembalianObserver
         $perubahan = array_diff(array_keys($pengembalian->getChanges()), ['updated_at']); 
  
         if (!empty($perubahan)) { 
-            $kolom = implode(', ', $perubahan); 
-            $this->catatLog("Merevisi data pengembalian (Kolom diubah: {$kolom})");
+            $pengembalian->loadMissing('peminjaman.user', 'peminjaman.detailPinjam.alat');
+            $nama = $pengembalian->peminjaman?->user?->name ?? 'User tidak tersedia';
+            $alat = $pengembalian->peminjaman?->detailPinjam->pluck('alat.nama_alat')->filter()->join(', ') ?: 'Alat tidak tersedia';
+            $detail = [];
+
+            if (in_array('kondisi_kembali', $perubahan, true)) {
+                $detail[] = "kondisi menjadi {$pengembalian->kondisi_kembali}";
+            }
+            if (in_array('denda', $perubahan, true)) {
+                $detail[] = 'denda menjadi Rp ' . number_format($pengembalian->denda, 0, ',', '.');
+            }
+
+            $this->catatLog("Merevisi pengembalian {$alat} milik {$nama}: " . implode(', ', $detail) . '.');
         } 
     } 
  
     public function deleted(Pengembalian $pengembalian): void 
     { 
-        $this->catatLog('Membatalkan/menghapus riwayat pengembalian');
+        $pengembalian->loadMissing('peminjaman.user', 'peminjaman.detailPinjam.alat');
+        $nama = $pengembalian->peminjaman?->user?->name ?? 'User tidak tersedia';
+        $this->catatLog("Menghapus riwayat pengembalian milik {$nama}.");
     }
 
     /**

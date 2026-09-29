@@ -212,6 +212,10 @@ class AdminController extends Controller
     public function editUser($id)
     {
         $user = User::findOrFail($id);
+        if ($user->isSuperAdmin() && ! request()->user()->isSuperAdmin()) {
+            abort(403, 'Hanya Super Admin yang dapat mengubah Super Admin.');
+        }
+
         return view('admin.user.edit', compact('user'));
     }
 
@@ -450,13 +454,29 @@ class AdminController extends Controller
     // 5. Menghapus data peminjaman
     public function destroyPeminjaman($id)
     {
-        $peminjaman = Peminjaman::with('pengembalian')->findOrFail($id);
+        $result = DB::transaction(function () use ($id) {
+            $peminjaman = Peminjaman::query()->lockForUpdate()->findOrFail($id);
 
-        if ($peminjaman->pengembalian()->exists() || in_array($peminjaman->status, ['dipinjam', 'selesai', 'telat'], true)) {
-            return back()->with('error', 'Peminjaman yang sudah diproses tidak dapat dihapus karena diperlukan untuk histori dan laporan.');
+            if ($peminjaman->pengembalian()->exists()) {
+                return ['error' => 'Peminjaman tidak dapat dihapus karena memiliki data pengembalian.'];
+            }
+
+            if ($peminjaman->status !== 'diajukan') {
+                return ['error' => 'Hanya pengajuan yang belum diproses yang dapat dihapus.'];
+            }
+
+            if ($peminjaman->detailPinjam()->exists()) {
+                return ['error' => 'Peminjaman tidak dapat dihapus karena memiliki detail alat. Histori transaksi tetap dipertahankan.'];
+            }
+
+            $peminjaman->delete();
+
+            return ['deleted' => true];
+        });
+
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
         }
-
-        $peminjaman->delete();
 
         return redirect()->route('admin.peminjaman.index')->with('success', 'Data peminjaman berhasil dihapus.');
     }

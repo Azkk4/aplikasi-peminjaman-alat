@@ -7,6 +7,7 @@ use App\Models\Pengembalian;
 use App\Models\Alat;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class PetugasController extends Controller
 {
@@ -32,17 +33,21 @@ class PetugasController extends Controller
     public function tolakPeminjaman($id)
     {
         try {
-            $peminjaman = Peminjaman::findOrFail($id);
+            DB::transaction(function () use ($id) {
+                $peminjaman = Peminjaman::query()->lockForUpdate()->findOrFail($id);
 
-            // Pastikan statusnya memang masih diajukan
-            if ($peminjaman->status == 'diajukan') {
+                if ($peminjaman->status !== 'diajukan') {
+                    throw new \RuntimeException('Status peminjaman sudah berubah.');
+                }
+
                 $peminjaman->update(['status' => 'ditolak']);
-                return redirect()->back()->with('success', 'Pengajuan peminjaman berhasil ditolak.');
-            }
+            });
 
-            return redirect()->back()->with('error', 'Status peminjaman sudah berubah.');
+            return redirect()->back()->with('success', 'Pengajuan peminjaman berhasil ditolak.');
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Pengajuan peminjaman gagal ditolak.');
         }
     }
 
@@ -81,7 +86,7 @@ class PetugasController extends Controller
     public function prosesPengembalian(Request $request, $peminjamanId)
     {
         $request->validate([
-            'kondisi_kembali' => 'required|string|max:255',
+            'kondisi_kembali' => ['required', Rule::in(['Baik', 'Rusak Ringan', 'Rusak Berat'])],
             'denda' => 'nullable|integer|min:0',
         ]);
 

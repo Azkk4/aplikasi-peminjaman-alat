@@ -135,13 +135,12 @@ class PeminjamController extends Controller
 
     public function kembalikanPeminjaman(Request $request, Peminjaman $peminjaman)
     {
+        abort_unless($peminjaman->user_id === auth()->id(), 403);
+
         try {
             DB::transaction(function () use ($peminjaman) {
                 $locked = Peminjaman::lockForUpdate()->findOrFail($peminjaman->id);
 
-                if ($locked->user_id !== auth()->id()) {
-                    abort(403);
-                }
                 if (! in_array($locked->status, ['dipinjam', 'telat'], true) || $locked->pengembalian_diajukan_at || $locked->pengembalian()->exists()) {
                     throw new \RuntimeException('Pengajuan pengembalian sudah dikirim atau peminjaman tidak memenuhi syarat.');
                 }
