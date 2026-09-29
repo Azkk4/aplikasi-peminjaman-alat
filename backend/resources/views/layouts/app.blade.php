@@ -64,7 +64,6 @@
                         Kelola Pengembalian
                     </a>
 
-                    <a href="{{ route('admin.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('admin.profil') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @elseif(auth()->user()->role === 'petugas')
                     <!-- MENU KHUSUS PETUGAS -->
                     <a href="{{ route('petugas.peminjaman.index') }}"
@@ -82,7 +81,6 @@
                         Cetak Laporan
                     </a>
 
-                    <a href="{{ route('petugas.profil') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('petugas.profil') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Profil</a>
                 @elseif(auth()->user()->role === 'peminjam')
                     <a href="{{ route('peminjam.dashboard') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.dashboard') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Dashboard</a>
                     <a href="{{ route('peminjam.katalog.index') }}" class="block px-4 py-2 rounded-lg transition {{ request()->routeIs('peminjam.katalog.*') ? 'bg-gray-800 text-white font-medium shadow' : 'text-gray-400 hover:bg-gray-800 hover:text-white' }}">Katalog Alat</a>
@@ -140,12 +138,10 @@
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.alat.index') }}">Kelola Alat</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.peminjaman.index') }}">Kelola Peminjaman</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.pengembalian.index') }}">Kelola Pengembalian</a>
-                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('admin.profil') }}">Profil</a>
                     @elseif(auth()->user()->role === 'petugas')
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.peminjaman.index') }}">Persetujuan Peminjaman</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.pengembalian.index') }}">Pemantauan Pengembalian</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.laporan.index') }}">Cetak Laporan</a>
-                        <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('petugas.profil') }}">Profil</a>
                     @else
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.dashboard') }}">Dashboard</a>
                         <a class="block rounded px-3 py-2 hover:bg-gray-800" href="{{ route('peminjam.katalog.index') }}">Katalog Alat</a>
