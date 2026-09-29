@@ -13,7 +13,7 @@ class User extends Authenticatable
     use HasApiTokens, HasFactory, Notifiable; 
     protected $table = 'users'; 
     protected $fillable = [ 
-        'name', 'email', 'password', 'role', 'is_super_admin', 'no_hp', 'alamat',
+        'name', 'email', 'password', 'role', 'is_super_admin', 'is_active', 'no_hp', 'alamat',
         'foto_profile' 
     ]; 
     protected $hidden = [ 
@@ -26,6 +26,7 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime', 
             'password' => 'hashed', // Laravel otomatis meng-hash teks apapun yang masuk ke properti password! 
             'is_super_admin' => 'boolean',
+            'is_active' => 'boolean',
         ]; 
     } 
 

@@ -10,7 +10,7 @@ class IsAdmin
 {
     public function handle(Request $request, Closure $next): Response 
     { 
-        if ($request->user() && $request->user()->role === 'admin') { 
+        if ($request->user() && $request->user()->is_active !== false && $request->user()->role === 'admin') {
             return $next($request); 
         } 
         

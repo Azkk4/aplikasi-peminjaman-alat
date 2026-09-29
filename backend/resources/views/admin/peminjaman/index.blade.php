@@ -39,7 +39,6 @@
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Alat yang Dipinjam</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Tgl Pinjam / Rencana Kembali</th>
                     <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Status</th>
-                    <th class="py-4 px-5 text-left text-xs font-bold text-gray-700 uppercase tracking-wider">Aksi</th>
                 </tr>
             </thead>
             <tbody class="text-gray-700 text-sm">
@@ -65,22 +64,10 @@
                     <td class="py-3 px-4 border-b">
                         @include('components.status-badge', ['status' => $peminjaman->display_status])
                     </td>
-                    <td class="py-3 px-4 border-b">
-                        <div class="flex flex-col space-y-2">
-                            <!-- Tombol Hapus -->
-                            <form action="{{ route('admin.peminjaman.destroy', $peminjaman->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus peminjaman?" data-confirm-message="Peminjaman milik {{ $peminjaman->user->name ?? 'user yang dihapus' }} akan dihapus jika belum diproses.">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-semibold transition w-full">
-                                    Hapus
-                                </button>
-                            </form>
-                        </div>
-                    </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="5">
+                    <td colspan="4">
                         @include('components.empty-state', [
                             'title' => 'Belum ada peminjaman',
                             'message' => 'Tidak ada data transaksi peminjaman. Mulai dengan menambahkan peminjaman baru.',

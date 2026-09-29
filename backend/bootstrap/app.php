@@ -7,6 +7,7 @@ use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsPetugas; 
 use App\Http\Middleware\IsPeminjam; 
 use App\Http\Middleware\CheckRole; 
+use App\Http\Middleware\EnsureUserIsActive;
  
 return Application::configure(basePath: dirname(__DIR__)) 
     ->withRouting( 
@@ -22,6 +23,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role.petugas' => IsPetugas::class, 
             'role.peminjam' => IsPeminjam::class, 
             'role' => CheckRole::class,
+            'active.user' => EnsureUserIsActive::class,
         ]); 
     })
     ->withExceptions(function (Exceptions $exceptions): void { 

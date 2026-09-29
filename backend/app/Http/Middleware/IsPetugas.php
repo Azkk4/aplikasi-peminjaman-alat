@@ -10,7 +10,7 @@ class IsPetugas
 {
     public function handle(Request $request, Closure $next): Response 
     { 
-        if ($request->user() && $request->user()->role === 'petugas') { 
+        if ($request->user() && $request->user()->is_active !== false && $request->user()->role === 'petugas') {
             return $next($request); 
         } 
         

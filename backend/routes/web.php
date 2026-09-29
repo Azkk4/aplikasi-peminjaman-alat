@@ -10,7 +10,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware('auth')->get('/dashboard', function () {
+Route::middleware(['auth', 'active.user'])->get('/dashboard', function () {
     return match (auth()->user()->role) {
         'admin' => redirect()->route('admin.dashboard'),
         'petugas' => redirect()->route('petugas.peminjaman.index'),
@@ -22,7 +22,7 @@ Route::middleware('auth')->get('/dashboard', function () {
 // ==========
 // Admin
 // ==========
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'active.user', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
         // CRUD Alat
@@ -35,6 +35,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
         Route::post('/users', [AdminController::class, 'storeUser'])->name('user.store');
         Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('user.edit');
         Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('user.update');
+        Route::patch('/users/{id}/status', [AdminController::class, 'updateUserStatus'])->name('user.status');
         Route::delete('/users/{id}', [AdminController::class, 'destroyUser'])->name('user.destroy');
         
         // CRUD Kategori
@@ -69,7 +70,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 // ==========
 // Petugas
 // ==========
-Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petugas.')->group(function () {
+Route::middleware(['auth', 'active.user', 'role:petugas,admin'])->prefix('petugas')->name('petugas.')->group(function () {
 
     // Peminjaman & Persetujuan
     Route::get('/peminjaman', [PetugasController::class, 'indexPeminjaman'])->name('peminjaman.index');
@@ -87,7 +88,7 @@ Route::middleware(['auth', 'role:petugas,admin'])->prefix('petugas')->name('petu
 // ==========
 // Peminjam
 // ==========
-Route::middleware(['auth', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
+Route::middleware(['auth', 'active.user', 'role:peminjam'])->prefix('peminjam')->name('peminjam.')->group(function () {
     Route::get('/dashboard', [PeminjamController::class, 'dashboard'])->name('dashboard');
     Route::get('/katalog', [PeminjamController::class, 'katalogAlat'])->name('katalog.index');
     Route::get('/katalog/{alat}', [PeminjamController::class, 'detailAlat'])->name('katalog.show');

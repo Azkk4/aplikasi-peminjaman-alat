@@ -10,7 +10,7 @@ class IsPeminjam
 {
     public function handle(Request $request, Closure $next): Response 
     { 
-        if ($request->user() && $request->user()->role === 'peminjam') { 
+        if ($request->user() && $request->user()->is_active !== false && $request->user()->role === 'peminjam') {
             return $next($request); 
         } 
         

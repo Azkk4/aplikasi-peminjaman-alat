@@ -274,16 +274,44 @@ class AdminController extends Controller
     // Menghapus user
     public function destroyUser($id)
     {
-        $user = User::findOrFail($id);
-        if ($user->id === request()->user()->id || ($user->isSuperAdmin() && ! request()->user()->isSuperAdmin())) {
-            abort(403, 'Akun ini tidak dapat dihapus oleh Anda.');
-        }
-        if ($user->peminjaman()->whereIn('status', ['diajukan', 'dipinjam', 'telat'])->exists()) {
-            return back()->with('error', 'User tidak dapat dihapus karena masih memiliki transaksi aktif.');
-        }
-        $user->delete();
+        return $this->changeUserActiveStatus($id, false);
+    }
 
-        return redirect()->route('admin.user.index')->with('success', 'User berhasil dihapus.');
+    public function updateUserStatus(Request $request, $id)
+    {
+        $data = $request->validate(['is_active' => ['required', 'boolean']]);
+
+        return $this->changeUserActiveStatus($id, (bool) $data['is_active']);
+    }
+
+    private function changeUserActiveStatus(int $id, bool $isActive)
+    {
+        $result = DB::transaction(function () use ($id, $isActive) {
+            $user = User::query()->lockForUpdate()->findOrFail($id);
+            $actor = request()->user();
+
+            if ($user->id === $actor->id) {
+                return ['error' => 'Anda tidak dapat menonaktifkan akun sendiri.'];
+            }
+            if (! $isActive && $user->isSuperAdmin()) {
+                return ['error' => 'Akun Super Admin tidak dapat dinonaktifkan.'];
+            }
+
+            if ($user->is_active !== $isActive) {
+                $user->update(['is_active' => $isActive]);
+            }
+
+            return ['is_active' => $isActive];
+        });
+
+        if (isset($result['error'])) {
+            return back()->with('error', $result['error']);
+        }
+
+        return redirect()->route('admin.user.index')->with(
+            'success',
+            $result['is_active'] ? 'User berhasil diaktifkan.' : 'User berhasil dinonaktifkan.'
+        );
     }
 
     public function indexKategori(Request $request)

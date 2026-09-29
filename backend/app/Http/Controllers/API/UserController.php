@@ -88,17 +88,14 @@ class UserController extends Controller
     } 
     public function destroy(User $user): JsonResponse 
     { 
-        if ($user->id === request()->user()->id || $user->isSuperAdmin() || $user->peminjaman()->whereIn('status', ['diajukan', 'dipinjam', 'telat'])->exists()) {
-            return response()->json(['message' => 'User tidak dapat dihapus karena dilindungi atau masih memiliki transaksi aktif.'], 422);
+        $actor = request()->user();
+        if ($user->id === $actor->id || $user->isSuperAdmin()) {
+            return response()->json(['message' => 'Akun sendiri dan Super Admin tidak dapat dinonaktifkan.'], 422);
         }
-        DB::transaction(function () use ($user) { 
-            if ($user->foto_profile) { 
-                Storage::disk('public')->delete($user->foto_profile); 
-            } 
-            $user->delete(); 
-        }); 
+        $user->update(['is_active' => false]);
+
         return response()->json([ 
-            'message' => 'Pengguna berhasil dihapus.' 
+            'message' => 'Pengguna berhasil dinonaktifkan.'
         ]); 
     } 
 }

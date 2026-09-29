@@ -47,6 +47,12 @@ class AuthController extends Controller
                 'email' => ['Kredensial yang diberikan tidak cocok dengan data kami.'], 
             ]); 
         } 
+
+        if (! $user->is_active) {
+            throw ValidationException::withMessages([
+                'email' => ['Akun Anda sedang nonaktif. Hubungi Administrator.'],
+            ]);
+        }
  
         $token = $user->createToken('auth_token')->plainTextToken; 
         return response()->json([ 

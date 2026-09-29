@@ -40,6 +40,7 @@
                     <th class="py-3 px-4 border-b">Email</th>
                     <th class="py-3 px-4 border-b">Role / Hak Akses</th>
                     <th class="py-3 px-4 border-b">No. HP</th>
+                    <th class="py-3 px-4 border-b">Status</th>
                     <th class="py-3 px-4 border-b">Aksi</th>
                 </tr>
             </thead>
@@ -60,26 +61,35 @@
                     </td>
                     <td class="py-3 px-4 border-b">{{ $user->no_hp ?? '-' }}</td>
                     <td class="py-3 px-4 border-b">
-                        <div class="flex items-center space-x-2">
+                        <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold {{ $user->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700' }}">
+                            {{ $user->is_active ? 'Aktif' : 'Nonaktif' }}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 border-b">
+                        <div class="flex flex-wrap items-center gap-2">
                             <!-- Tombol Edit -->
                             <a href="{{ route('admin.user.edit', $user->id) }}"
                                 class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
                                 Edit
                             </a>
-                            <!-- Tombol Hapus -->
-                            <form action="{{ route('admin.user.destroy', $user->id) }}" method="POST" data-confirm="true" data-confirm-title="Hapus user?" data-confirm-message="Akun {{ $user->name }} akan dihapus jika tidak memiliki transaksi aktif.">
+                            @if($user->id !== auth()->id() && ! $user->isSuperAdmin())
+                            <form action="{{ route('admin.user.status', $user->id) }}" method="POST" data-confirm="true" data-confirm-title="{{ $user->is_active ? 'Nonaktifkan user?' : 'Aktifkan user?' }}" data-confirm-message="{{ $user->is_active ? 'Akun ' . $user->name . ' tidak dapat login atau menggunakan fitur sampai diaktifkan kembali.' : 'Akun ' . $user->name . ' akan dapat menggunakan aplikasi kembali.' }}" data-confirm-accept="{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}">
                                 @csrf
-                                @method('DELETE')
-                                <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded text-xs font-semibold transition">
-                                    Hapus
+                                @method('PATCH')
+                                <input type="hidden" name="is_active" value="{{ $user->is_active ? 0 : 1 }}">
+                                <button type="submit" class="{{ $user->is_active ? 'bg-red-500 hover:bg-red-600' : 'bg-emerald-600 hover:bg-emerald-700' }} text-white px-3 py-1.5 rounded text-xs font-semibold transition">
+                                    {{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
                                 </button>
                             </form>
+                            @else
+                                <span class="text-xs text-gray-500">Dilindungi</span>
+                            @endif
                         </div>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="6" class="py-4 text-center text-gray-500">Belum ada data pengguna.</td>
+                    <td colspan="7" class="py-4 text-center text-gray-500">Belum ada data pengguna.</td>
                 </tr>
                 @endforelse
             </tbody>

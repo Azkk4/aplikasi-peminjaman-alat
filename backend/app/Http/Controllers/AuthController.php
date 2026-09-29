@@ -22,9 +22,16 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
             $user = Auth::user();
+            if (! $user->is_active) {
+                Auth::logout();
+                $request->session()->invalidate();
+                $request->session()->regenerateToken();
+
+                return back()->withErrors(['email' => 'Akun Anda sedang nonaktif. Hubungi Administrator.'])->onlyInput('email');
+            }
+
+            $request->session()->regenerate();
 
             // Redirect berdasarkan Role sesuai matriks Anda
             if ($user->role == 'admin') {

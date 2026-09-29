@@ -17,7 +17,7 @@ Route::post('/login', [AuthController::class, 'login']);
  
 // Protected Routes (Wajib membawa Bearer Token dari Sanctum) 
 Route::middleware('auth:sanctum')->group(function () { 
-    Route::get('/me', [AuthController::class, 'me']); 
+    Route::get('/me', [AuthController::class, 'me'])->middleware('active.user');
     Route::post('/logout', [AuthController::class, 'logout']); 
  
     // ==================
