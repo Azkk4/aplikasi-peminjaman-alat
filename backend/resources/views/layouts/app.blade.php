@@ -8,11 +8,12 @@
     <!-- Memuat Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     @vite('resources/js/app.js')
+    @stack('head')
 </head>
 
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-gray-100 font-sans antialiased @yield('body-class')">
 
-    <div class="flex min-h-screen overflow-hidden">
+    <div id="app-shell" class="flex min-h-screen overflow-hidden">
 
         <!-- SIDEBAR -->
         <aside class="w-64 bg-gray-900 text-white flex-col hidden md:flex print-hidden">
@@ -96,7 +97,7 @@
         </aside>
 
         <!-- MAIN CONTENT CONTAINER -->
-        <div class="flex-1 flex flex-col overflow-y-auto">
+        <div id="app-content" class="flex-1 flex flex-col overflow-y-auto">
 
             <!-- NAVBAR ATAS -->
             <header class="bg-white shadow-sm min-h-16 flex items-center justify-between px-4 sm:px-6 py-4 z-10 print-hidden">

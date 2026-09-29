@@ -1,6 +1,12 @@
-@extends('layouts.report')
+@extends('layouts.app')
 
 @section('title', 'Laporan Transaksi Peminjaman')
+@section('header-title', 'Laporan Peminjaman & Pengembalian Alat')
+@section('body-class', 'report-page')
+
+@push('head')
+    @include('components.report-styles')
+@endpush
 
 @section('content')
 <div class="report-actions">

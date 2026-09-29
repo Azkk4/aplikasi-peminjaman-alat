@@ -61,7 +61,9 @@ class ReportPrintViewTest extends TestCase
             ->assertSee('Multimeter Digital')
             ->assertSee('2 unit')
             ->assertSee('Dipinjam')
-            ->assertDontSee('mobile-menu')
-            ->assertDontSee('Logout');
+            ->assertSee('id="mobile-menu"', false)
+            ->assertSee('Logout')
+            ->assertSee('size: A4 landscape')
+            ->assertSee('report-actions, .report-filters', false);
     }
 }
